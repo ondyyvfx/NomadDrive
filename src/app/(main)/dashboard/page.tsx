@@ -133,7 +133,7 @@ export default async function DashboardPage() {
                     <div className="flex flex-col gap-3">
                         {bookings.map(b => {
                             const s = statusConfig[b.status] ?? statusConfig.pending
-                            const car = b.car as { brand: string; model: string } | null
+                            const car = (Array.isArray(b.car) ? b.car[0] : b.car) as { brand: string; model: string } | null
                             return (
                                 <Link
                                     key={b.id}
