@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Calendar, ChevronRight, Info } from 'lucide-react'
+import { ChevronRight, Info } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { CarForRent } from '@/types'
 import type { User } from '@supabase/supabase-js'
@@ -119,19 +119,19 @@ export function BookingWidget({ car, user }: Props) {
     const isAvailable = car.status === 'available'
 
     return (
-        <div className="bg-white border border-black/[0.08] rounded-[20px] shadow-md overflow-hidden scale-in">
+        <div className="bg-[#111111] border border-white/[0.08] rounded-[20px] shadow-lg overflow-hidden scale-in">
 
             {/* Header */}
-            <div className="px-6 pt-6 pb-5 border-b border-black/[0.06]">
+            <div className="px-6 pt-6 pb-5 border-b border-white/[0.06]">
                 <div className="flex items-baseline justify-between">
                     <div>
-                        <span className="text-[26px] font-semibold tracking-tight">
+                        <span className="text-[26px] font-bold tracking-tight text-[#f0ece4]">
                             {car.price_per_day.toLocaleString('ru-RU')} ₸
                         </span>
-                        <span className="text-[14px] text-[#6e6e73] ml-1">/ день</span>
+                        <span className="text-[14px] text-[#6b6b6b] ml-1">/ день</span>
                     </div>
                     {days > 0 && (
-                        <span className="text-[13px] text-[#6e6e73]">
+                        <span className="text-[13px] text-[#6b6b6b]">
                             {days} {days === 1 ? 'день' : days < 5 ? 'дня' : 'дней'}
                         </span>
                     )}
@@ -142,10 +142,10 @@ export function BookingWidget({ car, user }: Props) {
 
                 {/* Даты */}
                 <div>
-                    <p className="text-[13px] font-medium text-[#6e6e73] mb-2">Даты аренды</p>
+                    <p className="text-[13px] font-medium text-[#6b6b6b] mb-2">Даты аренды</p>
                     <div className="grid grid-cols-2 gap-2">
                         <div className="flex flex-col gap-1">
-                            <label className="text-[11px] text-[#aeaeb2] uppercase tracking-wide">Заезд</label>
+                            <label className="text-[11px] text-[#3d3d3d] uppercase tracking-wide">Заезд</label>
                             <input
                                 type="date"
                                 value={startDate}
@@ -155,17 +155,17 @@ export function BookingWidget({ car, user }: Props) {
                                     if (endDate && e.target.value >= endDate) setEndDate('')
                                     setError('')
                                 }}
-                                className="w-full h-11 px-3 bg-[#f5f5f7] border border-black/[0.08] rounded-[10px] text-[14px] text-[#1d1d1f] outline-none focus:border-accent focus:ring-3 focus:ring-[#0a5f4a]/[0.08] focus:bg-white transition-all cursor-pointer"
+                                className="w-full h-11 px-3 bg-[#161616] border border-white/[0.08] rounded-[10px] text-[14px] text-[#f0ece4] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] transition-all cursor-pointer"
                             />
                         </div>
                         <div className="flex flex-col gap-1">
-                            <label className="text-[11px] text-[#aeaeb2] uppercase tracking-wide">Выезд</label>
+                            <label className="text-[11px] text-[#3d3d3d] uppercase tracking-wide">Выезд</label>
                             <input
                                 type="date"
                                 value={endDate}
                                 min={startDate || today}
                                 onChange={e => { setEndDate(e.target.value); setError('') }}
-                                className="w-full h-11 px-3 bg-[#f5f5f7] border border-black/[0.08] rounded-[10px] text-[14px] text-[#1d1d1f] outline-none focus:border-accent focus:ring-3 focus:ring-[#0a5f4a]/[0.08] focus:bg-white transition-all cursor-pointer"
+                                className="w-full h-11 px-3 bg-[#161616] border border-white/[0.08] rounded-[10px] text-[14px] text-[#f0ece4] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] transition-all cursor-pointer"
                             />
                         </div>
                     </div>
@@ -174,7 +174,7 @@ export function BookingWidget({ car, user }: Props) {
                 {/* Промокод */}
                 {days > 0 && (
                     <div className="fade-in">
-                        <p className="text-[13px] font-medium text-[#6e6e73] mb-2">Промокод</p>
+                        <p className="text-[13px] font-medium text-[#6b6b6b] mb-2">Промокод</p>
                         <div className="flex gap-2">
                             <input
                                 type="text"
@@ -185,12 +185,12 @@ export function BookingWidget({ car, user }: Props) {
                                     setPromoError('')
                                 }}
                                 placeholder="NOMAD2025"
-                                className="flex-1 h-10 px-3.5 bg-[#f5f5f7] border border-black/[0.08] rounded-[10px] text-[14px] uppercase outline-none focus:border-accent focus:ring-3 focus:ring-[#0a5f4a]/[0.08] focus:bg-white transition-all placeholder:normal-case placeholder:text-[#aeaeb2]"
+                                className="flex-1 h-10 px-3.5 bg-[#161616] border border-white/[0.08] rounded-[10px] text-[14px] text-[#f0ece4] uppercase outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] transition-all placeholder:normal-case placeholder:text-[#3d3d3d]"
                             />
                             <button
                                 onClick={applyPromo}
                                 disabled={promoLoading || !promoCode.trim()}
-                                className="h-10 px-4 bg-[#f5f5f7] border border-black/[0.08] rounded-[10px] text-[13px] font-medium text-[#1d1d1f] hover:bg-black/[0.04] transition-colors disabled:opacity-50"
+                                className="h-10 px-4 bg-[#1a1a1a] border border-white/[0.08] rounded-[10px] text-[13px] font-medium text-[#f0ece4] hover:bg-white/[0.04] transition-colors disabled:opacity-40"
                             >
                                 {promoLoading ? '...' : 'Применить'}
                             </button>
@@ -211,25 +211,25 @@ export function BookingWidget({ car, user }: Props) {
 
                 {/* Итог */}
                 {days > 0 && (
-                    <div className="bg-[#f5f5f7] rounded-[12px] p-4 flex flex-col gap-2 fade-in">
+                    <div className="bg-[#161616] border border-white/[0.06] rounded-[12px] p-4 flex flex-col gap-2 fade-in">
                         <div className="flex justify-between text-[14px]">
-                            <span className="text-[#6e6e73]">
+                            <span className="text-[#6b6b6b]">
                                 {car.price_per_day.toLocaleString('ru-RU')} ₸ × {days} дн.
                             </span>
-                            <span className="font-medium">{basePrice.toLocaleString('ru-RU')} ₸</span>
+                            <span className="font-medium text-[#f0ece4]">{basePrice.toLocaleString('ru-RU')} ₸</span>
                         </div>
                         {discount > 0 && (
                             <div className="flex justify-between text-[14px]">
-                                <span className="text-[#6e6e73]">Скидка</span>
+                                <span className="text-[#6b6b6b]">Скидка</span>
                                 <span className="text-[#34c759] font-medium">
                                     −{discount.toLocaleString('ru-RU')} ₸
                                 </span>
                             </div>
                         )}
-                        <div className="h-px bg-black/[0.06] my-1" />
+                        <div className="h-px bg-white/[0.06] my-1" />
                         <div className="flex justify-between">
-                            <span className="text-[15px] font-semibold">Итого</span>
-                            <span className="text-[15px] font-semibold text-accent">
+                            <span className="text-[15px] font-bold text-[#f0ece4]">Итого</span>
+                            <span className="text-[15px] font-bold text-[#c9a96e]">
                                 {totalPrice.toLocaleString('ru-RU')} ₸
                             </span>
                         </div>
@@ -248,10 +248,10 @@ export function BookingWidget({ car, user }: Props) {
                 <button
                     onClick={handleBooking}
                     disabled={loading || !isAvailable}
-                    className="w-full h-12 bg-accent text-white font-semibold rounded-[12px] hover:bg-[#0a6e56] transition-all duration-200 flex items-center justify-center gap-2 text-[15px] disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full h-12 bg-[#c9a96e] text-[#0a0a0a] font-bold rounded-[12px] hover:bg-[#d4b87a] transition-all duration-300 flex items-center justify-center gap-2 text-[15px] disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                     {loading ? (
-                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span className="w-5 h-5 border-2 border-[#0a0a0a]/30 border-t-[#0a0a0a] rounded-full animate-spin" />
                     ) : (
                         <>
                             {!isAvailable
@@ -265,7 +265,7 @@ export function BookingWidget({ car, user }: Props) {
                 </button>
 
                 {/* Note */}
-                <p className="text-[12px] text-[#aeaeb2] text-center leading-relaxed">
+                <p className="text-[12px] text-[#3d3d3d] text-center leading-relaxed">
                     Бесплатная отмена за 24 часа до начала аренды
                 </p>
 

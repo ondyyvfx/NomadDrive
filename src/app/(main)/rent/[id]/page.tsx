@@ -15,9 +15,9 @@ const fuelLabel: Record<string, string> = {
     petrol: 'Бензин', diesel: 'Дизель', electric: 'Электро', hybrid: 'Гибрид',
 }
 const statusConfig: Record<string, { label: string; classes: string }> = {
-    available: { label: 'Доступен', classes: 'bg-[#34c759]/[0.08] text-[#34c759]' },
-    rented: { label: 'Занят', classes: 'bg-[#ff9f0a]/[0.08] text-[#ff9f0a]' },
-    maintenance: { label: 'На ТО', classes: 'bg-[#6e6e73]/[0.08] text-[#6e6e73]' },
+    available: { label: 'Доступен', classes: 'text-[#34c759]' },
+    rented: { label: 'Занят', classes: 'text-[#ff9f0a]' },
+    maintenance: { label: 'На ТО', classes: 'text-[#6b6b6b]' },
 }
 
 export async function generateMetadata({
@@ -74,13 +74,13 @@ export default async function CarPage({
             <div className="flex items-center gap-2 mb-6 fade-in">
                 <Link
                     href="/rent"
-                    className="inline-flex items-center gap-1.5 text-[14px] text-[#6e6e73] hover:text-[#1d1d1f] transition-colors"
+                    className="inline-flex items-center gap-1.5 text-[14px] text-[#6b6b6b] hover:text-[#f0ece4] transition-colors"
                 >
                     <ChevronLeft size={16} />
                     Каталог аренды
                 </Link>
-                <span className="text-[#aeaeb2]">/</span>
-                <span className="text-[14px] text-[#1d1d1f]">
+                <span className="text-[#3d3d3d]">/</span>
+                <span className="text-[14px] text-[#f0ece4]">
                     {car.brand} {car.model}
                 </span>
             </div>
@@ -94,7 +94,7 @@ export default async function CarPage({
                     {/* Галерея */}
                     <div className="fade-in">
                         {/* Главное фото */}
-                        <div className="relative h-[280px] md:h-[420px] rounded-[16px] overflow-hidden bg-[#f5f5f7]">
+                        <div className="relative h-[280px] md:h-[420px] rounded-[16px] overflow-hidden bg-[#161616]">
                             {images[0] ? (
                                 <Image
                                     src={images[0]}
@@ -110,7 +110,7 @@ export default async function CarPage({
                             )}
                             {/* Статус */}
                             <div className="absolute top-4 left-4">
-                                <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-[13px] font-medium backdrop-blur-sm bg-white/90 ${status.classes}`}>
+                                <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-[13px] font-medium backdrop-blur-sm bg-black/70 ${status.classes}`}>
                                     {status.label}
                                 </span>
                             </div>
@@ -122,7 +122,7 @@ export default async function CarPage({
                                 {images.slice(1, 5).map((img: string, i: number) => (
                                     <div
                                         key={i}
-                                        className="relative h-20 flex-1 rounded-[10px] overflow-hidden bg-[#f5f5f7] cursor-pointer hover:opacity-80 transition-opacity"
+                                        className="relative h-20 flex-1 rounded-[10px] overflow-hidden bg-[#161616] cursor-pointer hover:opacity-80 transition-opacity"
                                     >
                                         <Image src={img} alt="" fill className="object-cover" />
                                     </div>
@@ -135,23 +135,23 @@ export default async function CarPage({
                     <div className="fade-in-up">
                         <div className="flex items-start justify-between gap-4 flex-wrap">
                             <div>
-                                <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mb-1">
+                                <h1 className="text-2xl md:text-3xl font-bold tracking-[-0.04em] mb-1 text-[#f0ece4]">
                                     {car.brand} {car.model}
                                 </h1>
-                                <p className="text-[#6e6e73] text-[16px]">{car.year} год выпуска</p>
+                                <p className="text-[#6b6b6b] text-[16px]">{car.year} год выпуска</p>
                             </div>
                             <div className="text-right">
-                                <p className="text-2xl font-semibold tracking-tight text-[#1d1d1f]">
+                                <p className="text-2xl font-bold tracking-tight text-[#f0ece4]">
                                     {car.price_per_day.toLocaleString('ru-RU')} ₸
                                 </p>
-                                <p className="text-[13px] text-[#6e6e73]">за сутки</p>
+                                <p className="text-[13px] text-[#6b6b6b]">за сутки</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Характеристики */}
-                    <div className="bg-[#f5f5f7] rounded-[14px] p-5 fade-in-up">
-                        <h2 className="text-[16px] font-semibold tracking-tight mb-4">
+                    <div className="bg-[#111111] border border-white/[0.07] rounded-[14px] p-5 fade-in-up">
+                        <h2 className="text-[16px] font-bold tracking-tight mb-4 text-[#f0ece4]">
                             Характеристики
                         </h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -189,10 +189,10 @@ export default async function CarPage({
                     {/* Описание */}
                     {car.description && (
                         <div className="fade-in-up">
-                            <h2 className="text-[16px] font-semibold tracking-tight mb-3">
+                            <h2 className="text-[16px] font-bold tracking-tight mb-3 text-[#f0ece4]">
                                 Описание
                             </h2>
-                            <p className="text-[15px] text-[#6e6e73] leading-relaxed">
+                            <p className="text-[15px] text-[#6b6b6b] leading-relaxed">
                                 {car.description}
                             </p>
                         </div>
@@ -201,14 +201,14 @@ export default async function CarPage({
                     {/* Фичи */}
                     {car.features?.length > 0 && (
                         <div className="fade-in-up">
-                            <h2 className="text-[16px] font-semibold tracking-tight mb-3">
+                            <h2 className="text-[16px] font-bold tracking-tight mb-3 text-[#f0ece4]">
                                 Комплектация
                             </h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 {car.features.map((f: string) => (
                                     <div key={f} className="flex items-center gap-2.5">
-                                        <CheckCircle2 size={16} className="text-accent flex-shrink-0" />
-                                        <span className="text-[14px] text-[#6e6e73]">{f}</span>
+                                        <CheckCircle2 size={16} className="text-[#c9a96e] flex-shrink-0" />
+                                        <span className="text-[14px] text-[#6b6b6b]">{f}</span>
                                     </div>
                                 ))}
                             </div>
@@ -224,10 +224,10 @@ export default async function CarPage({
                         ].map(({ icon: Icon, text }) => (
                             <div
                                 key={text}
-                                className="flex items-center gap-3 p-4 bg-white border border-black/[0.06] rounded-[12px]"
+                                className="flex items-center gap-3 p-4 bg-[#111111] border border-white/[0.07] rounded-[12px]"
                             >
-                                <Icon size={16} className="text-accent flex-shrink-0" />
-                                <span className="text-[13px] font-medium text-[#1d1d1f]">{text}</span>
+                                <Icon size={16} className="text-[#c9a96e] flex-shrink-0" />
+                                <span className="text-[13px] font-medium text-[#f0ece4]">{text}</span>
                             </div>
                         ))}
                     </div>
@@ -244,7 +244,7 @@ export default async function CarPage({
             {/* ── Похожие авто ── */}
             {similar && similar.length > 0 && (
                 <div className="mt-16 fade-in-up">
-                    <h2 className="text-[20px] font-semibold tracking-tight mb-6">
+                    <h2 className="text-[20px] font-bold tracking-tight mb-6 text-[#f0ece4]">
                         Другие {car.brand}
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 stagger-children">
@@ -252,28 +252,28 @@ export default async function CarPage({
                             <Link
                                 key={s.id}
                                 href={`/cars/${s.id}`}
-                                className="group bg-white border border-black/[0.06] rounded-[14px] overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+                                className="group bg-[#111111] border border-white/[0.07] rounded-[14px] overflow-hidden hover:shadow-lg hover:-translate-y-1 hover:border-white/[0.12] transition-all duration-300"
                             >
-                                <div className="relative h-40 bg-[#f5f5f7]">
+                                <div className="relative h-40 bg-[#161616]">
                                     {s.image_urls?.[0] ? (
                                         <Image
                                             src={s.image_urls[0]}
                                             alt={`${s.brand} ${s.model}`}
                                             fill
-                                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                            className="object-cover group-hover:scale-105 transition-transform duration-700"
                                         />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-[40px]">🚗</div>
                                     )}
                                 </div>
                                 <div className="p-4">
-                                    <p className="font-semibold text-[15px] tracking-tight">
+                                    <p className="font-bold text-[15px] tracking-tight text-[#f0ece4]">
                                         {s.brand} {s.model}
                                     </p>
-                                    <p className="text-[13px] text-[#6e6e73] mt-0.5">{s.year}</p>
-                                    <p className="text-[14px] font-semibold text-accent mt-2">
+                                    <p className="text-[13px] text-[#6b6b6b] mt-0.5">{s.year}</p>
+                                    <p className="text-[14px] font-bold text-[#c9a96e] mt-2">
                                         {s.price_per_day.toLocaleString('ru-RU')} ₸
-                                        <span className="text-[12px] font-normal text-[#6e6e73]">/день</span>
+                                        <span className="text-[12px] font-normal text-[#6b6b6b]">/день</span>
                                     </p>
                                 </div>
                             </Link>
@@ -295,11 +295,11 @@ function SpecItem({
 }) {
     return (
         <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-1.5 text-[#6e6e73]">
+            <div className="flex items-center gap-1.5 text-[#6b6b6b]">
                 {icon}
                 <span className="text-[12px]">{label}</span>
             </div>
-            <p className="text-[14px] font-semibold text-[#1d1d1f] truncate">{value}</p>
+            <p className="text-[14px] font-bold text-[#f0ece4] truncate">{value}</p>
         </div>
     )
 }

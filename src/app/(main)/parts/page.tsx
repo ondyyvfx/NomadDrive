@@ -21,7 +21,7 @@ export default async function PartsPage() {
                 <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-2">
                     Запчасти
                 </h1>
-                <p className="text-[#6e6e73] text-[16px]">
+                <p className="text-[#6b6b6b] text-[16px]">
                     {parts?.length ?? 0} позиций в наличии
                 </p>
             </div>

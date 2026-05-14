@@ -50,7 +50,7 @@ export default async function DashboardPage() {
         pending: { label: 'Ожидает', icon: <Clock size={13} />, color: 'text-[#ff9f0a] bg-[#ff9f0a]/[0.08]' },
         confirmed: { label: 'Подтверждён', icon: <CheckCircle2 size={13} />, color: 'text-[#34c759] bg-[#34c759]/[0.08]' },
         active: { label: 'Активна', icon: <CheckCircle2 size={13} />, color: 'text-[#34c759] bg-[#34c759]/[0.08]' },
-        completed: { label: 'Завершён', icon: <CheckCircle2 size={13} />, color: 'text-[#6e6e73] bg-[#6e6e73]/[0.08]' },
+        completed: { label: 'Завершён', icon: <CheckCircle2 size={13} />, color: 'text-[#6b6b6b] bg-white/[0.05]' },
         cancelled: { label: 'Отменён', icon: <XCircle size={13} />, color: 'text-[#ff3b30] bg-[#ff3b30]/[0.08]' },
         delivered: { label: 'Доставлен', icon: <CheckCircle2 size={13} />, color: 'text-[#34c759] bg-[#34c759]/[0.08]' },
     }
@@ -58,15 +58,13 @@ export default async function DashboardPage() {
     return (
         <div className="max-w-[1200px] mx-auto px-5 py-10">
 
-            {/* Приветствие */}
             <div className="mb-10 fade-in">
-                <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mb-1">
+                <h1 className="text-2xl md:text-3xl font-bold tracking-[-0.04em] mb-1 text-[#f0ece4]">
                     Привет, {firstName} 👋
                 </h1>
-                <p className="text-[#6e6e73] text-[15px]">{user.email}</p>
+                <p className="text-[#6b6b6b] text-[15px]">{user.email}</p>
             </div>
 
-            {/* Быстрые ссылки */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10 stagger-children">
                 {[
                     {
@@ -75,7 +73,7 @@ export default async function DashboardPage() {
                         label: 'Мои бронирования',
                         value: bookingStats.total,
                         sub: bookingStats.active > 0 ? `${bookingStats.active} активных` : 'Нет активных',
-                        color: 'text-accent bg-accent/[0.07]',
+                        color: 'text-[#c9a96e] bg-[#c9a96e]/[0.07]',
                     },
                     {
                         href: '/dashboard/orders',
@@ -97,35 +95,34 @@ export default async function DashboardPage() {
                     <Link
                         key={href}
                         href={href}
-                        className="group bg-white border border-black/[0.06] rounded-[16px] p-6 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-between"
+                        className="group bg-[#111111] border border-white/[0.07] rounded-[16px] p-6 hover:shadow-lg hover:-translate-y-0.5 hover:border-white/[0.12] transition-all duration-300 flex items-center justify-between"
                     >
                         <div className="flex items-center gap-4">
                             <div className={`w-11 h-11 rounded-[12px] flex items-center justify-center flex-shrink-0 ${color}`}>
                                 <Icon size={20} />
                             </div>
                             <div>
-                                <p className="text-[14px] text-[#6e6e73]">{label}</p>
-                                <p className="text-[20px] font-semibold tracking-tight text-[#1d1d1f]">
+                                <p className="text-[14px] text-[#6b6b6b]">{label}</p>
+                                <p className="text-[20px] font-bold tracking-tight text-[#f0ece4]">
                                     {value !== null ? value : ''}
                                 </p>
-                                <p className="text-[12px] text-[#aeaeb2]">{sub}</p>
+                                <p className="text-[12px] text-[#3d3d3d]">{sub}</p>
                             </div>
                         </div>
-                        <ChevronRight size={18} className="text-[#aeaeb2] group-hover:text-[#1d1d1f] transition-colors" />
+                        <ChevronRight size={18} className="text-[#3d3d3d] group-hover:text-[#f0ece4] transition-colors" />
                     </Link>
                 ))}
             </div>
 
-            {/* Последние бронирования */}
             {bookings && bookings.length > 0 && (
                 <div className="mb-8 fade-in-up">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-[18px] font-semibold tracking-tight">
+                        <h2 className="text-[18px] font-bold tracking-tight text-[#f0ece4]">
                             Последние бронирования
                         </h2>
                         <Link
                             href="/dashboard/bookings"
-                            className="text-[14px] text-accent hover:underline"
+                            className="text-[14px] text-[#c9a96e] hover:underline"
                         >
                             Все →
                         </Link>
@@ -138,17 +135,17 @@ export default async function DashboardPage() {
                                 <Link
                                     key={b.id}
                                     href={`/dashboard/bookings/${b.id}`}
-                                    className="bg-white border border-black/[0.06] rounded-[12px] p-4 flex items-center justify-between gap-4 hover:shadow-sm transition-all duration-200 group"
+                                    className="bg-[#111111] border border-white/[0.07] rounded-[12px] p-4 flex items-center justify-between gap-4 hover:border-white/[0.12] hover:shadow-md transition-all duration-300 group"
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-accent/[0.07] rounded-[10px] flex items-center justify-center flex-shrink-0">
-                                            <Calendar size={18} className="text-accent" />
+                                        <div className="w-10 h-10 bg-[#c9a96e]/[0.07] rounded-[10px] flex items-center justify-center flex-shrink-0">
+                                            <Calendar size={18} className="text-[#c9a96e]" />
                                         </div>
                                         <div>
-                                            <p className="text-[15px] font-semibold tracking-tight">
+                                            <p className="text-[15px] font-semibold tracking-tight text-[#f0ece4]">
                                                 {car ? `${car.brand} ${car.model}` : 'Автомобиль'}
                                             </p>
-                                            <p className="text-[12px] text-[#6e6e73]">
+                                            <p className="text-[12px] text-[#6b6b6b]">
                                                 {b.start_date} — {b.end_date}
                                             </p>
                                         </div>
@@ -158,10 +155,10 @@ export default async function DashboardPage() {
                                             {s.icon}
                                             {s.label}
                                         </span>
-                                        <p className="text-[14px] font-semibold hidden sm:block">
+                                        <p className="text-[14px] font-semibold hidden sm:block text-[#f0ece4]">
                                             {b.total_price.toLocaleString('ru-RU')} ₸
                                         </p>
-                                        <ChevronRight size={16} className="text-[#aeaeb2] group-hover:text-[#1d1d1f] transition-colors" />
+                                        <ChevronRight size={16} className="text-[#3d3d3d] group-hover:text-[#f0ece4] transition-colors" />
                                     </div>
                                 </Link>
                             )
@@ -170,16 +167,15 @@ export default async function DashboardPage() {
                 </div>
             )}
 
-            {/* Последние заказы */}
             {orders && orders.length > 0 && (
                 <div className="fade-in-up">
                     <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-[18px] font-semibold tracking-tight">
+                        <h2 className="text-[18px] font-bold tracking-tight text-[#f0ece4]">
                             Последние заказы
                         </h2>
                         <Link
                             href="/dashboard/orders"
-                            className="text-[14px] text-accent hover:underline"
+                            className="text-[14px] text-[#c9a96e] hover:underline"
                         >
                             Все →
                         </Link>
@@ -191,17 +187,17 @@ export default async function DashboardPage() {
                                 <Link
                                     key={o.id}
                                     href={`/dashboard/orders/${o.id}`}
-                                    className="bg-white border border-black/[0.06] rounded-[12px] p-4 flex items-center justify-between gap-4 hover:shadow-sm transition-all duration-200 group"
+                                    className="bg-[#111111] border border-white/[0.07] rounded-[12px] p-4 flex items-center justify-between gap-4 hover:border-white/[0.12] hover:shadow-md transition-all duration-300 group"
                                 >
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 bg-[#b8860b]/[0.07] rounded-[10px] flex items-center justify-center flex-shrink-0">
                                             <ShoppingBag size={18} className="text-[#b8860b]" />
                                         </div>
                                         <div>
-                                            <p className="text-[15px] font-semibold tracking-tight">
+                                            <p className="text-[15px] font-semibold tracking-tight text-[#f0ece4]">
                                                 Заказ #{o.id.slice(0, 8).toUpperCase()}
                                             </p>
-                                            <p className="text-[12px] text-[#6e6e73]">
+                                            <p className="text-[12px] text-[#6b6b6b]">
                                                 {new Date(o.created_at).toLocaleDateString('ru-RU')}
                                             </p>
                                         </div>
@@ -211,10 +207,10 @@ export default async function DashboardPage() {
                                             {s.icon}
                                             {s.label}
                                         </span>
-                                        <p className="text-[14px] font-semibold hidden sm:block">
+                                        <p className="text-[14px] font-semibold hidden sm:block text-[#f0ece4]">
                                             {o.total.toLocaleString('ru-RU')} ₸
                                         </p>
-                                        <ChevronRight size={16} className="text-[#aeaeb2] group-hover:text-[#1d1d1f] transition-colors" />
+                                        <ChevronRight size={16} className="text-[#3d3d3d] group-hover:text-[#f0ece4] transition-colors" />
                                     </div>
                                 </Link>
                             )

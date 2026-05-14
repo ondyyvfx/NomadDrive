@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect } from 'react'
 import { User, ShoppingCart, LayoutDashboard } from 'lucide-react'
 import { LogoutButton } from './LogoutButton'
+import { useLanguage } from '@/contexts/LanguageContext'
 import type { User as SupabaseUser } from '@supabase/supabase-js'
 
 interface MobileMenuProps {
@@ -15,7 +16,16 @@ interface MobileMenuProps {
     firstName: string
 }
 
+const UI: Record<string, { ru: string; kz: string }> = {
+    dashboard:  { ru: 'Личный кабинет', kz: 'Жеке кабинет' },
+    cart:       { ru: 'Корзина',        kz: 'Себет'         },
+    register:   { ru: 'Регистрация',    kz: 'Тіркелу'       },
+    login:      { ru: 'Войти',          kz: 'Кіру'          },
+}
+
 export function MobileMenu({ isOpen, onClose, navLinks, user, profile, firstName }: MobileMenuProps) {
+    const { lang, setLang } = useLanguage()
+
     useEffect(() => {
         document.body.style.overflow = isOpen ? 'hidden' : ''
         return () => { document.body.style.overflow = '' }
@@ -25,59 +35,56 @@ export function MobileMenu({ isOpen, onClose, navLinks, user, profile, firstName
 
     return (
         <div
-            className="md:hidden fixed z-40 bg-white border-b border-black/[0.06]"
+            className="md:hidden fixed z-40 bg-[#0a0a0a] border-b border-white/[0.06]"
             style={{ top: 56, left: 0, right: 0, bottom: 0 }}
         >
             <div className="flex flex-col h-full px-5 py-6 overflow-y-auto">
 
-                {/* Если залогинен — показываем профиль */}
                 {user && (
-                    <div className="flex items-center gap-3 p-4 bg-[#f5f5f7] rounded-[12px] mb-6">
-                        <div className="w-10 h-10 rounded-full bg-accent/[0.1] flex items-center justify-center flex-shrink-0">
-                            <User size={18} className="text-accent" />
+                    <div className="flex items-center gap-3 p-4 bg-[#111111] rounded-[12px] mb-6 border border-white/[0.06]">
+                        <div className="w-10 h-10 rounded-full bg-[#c9a96e]/[0.12] flex items-center justify-center flex-shrink-0">
+                            <User size={18} className="text-[#c9a96e]" />
                         </div>
                         <div className="min-w-0">
-                            <p className="font-medium text-[15px] text-[#1d1d1f] truncate">{firstName}</p>
-                            <p className="text-[13px] text-[#6e6e73] truncate">{user.email}</p>
+                            <p className="font-semibold text-[15px] text-[#f0ece4] truncate">{firstName}</p>
+                            <p className="text-[13px] text-[#6b6b6b] truncate">{user.email}</p>
                         </div>
                     </div>
                 )}
 
-                {/* Nav links */}
                 <nav className="flex flex-col gap-1 mb-4">
                     {navLinks.map(link => (
                         <Link
                             key={link.href}
                             href={link.href}
                             onClick={onClose}
-                            className="px-4 py-3.5 text-[17px] font-medium text-[#1d1d1f] rounded-[10px] hover:bg-[#f5f5f7] transition-colors"
+                            className="px-4 py-3.5 text-[17px] font-medium text-[#f0ece4] rounded-[10px] hover:bg-white/[0.04] transition-colors"
                         >
                             {link.label}
                         </Link>
                     ))}
                 </nav>
 
-                <hr className="border-black/[0.06] my-2" />
+                <hr className="border-white/[0.06] my-2" />
 
-                {/* Auth секция */}
                 <div className="flex flex-col gap-1 mt-2">
                     {user ? (
                         <>
                             <Link
                                 href="/dashboard"
                                 onClick={onClose}
-                                className="flex items-center gap-3 px-4 py-3.5 text-[16px] font-medium text-[#1d1d1f] rounded-[10px] hover:bg-[#f5f5f7] transition-colors"
+                                className="flex items-center gap-3 px-4 py-3.5 text-[16px] font-medium text-[#f0ece4] rounded-[10px] hover:bg-white/[0.04] transition-colors"
                             >
-                                <LayoutDashboard size={18} className="text-[#6e6e73]" />
-                                Личный кабинет
+                                <LayoutDashboard size={18} className="text-[#6b6b6b]" />
+                                {UI.dashboard[lang]}
                             </Link>
                             <Link
                                 href="/cart"
                                 onClick={onClose}
-                                className="flex items-center gap-3 px-4 py-3.5 text-[16px] font-medium text-[#1d1d1f] rounded-[10px] hover:bg-[#f5f5f7] transition-colors"
+                                className="flex items-center gap-3 px-4 py-3.5 text-[16px] font-medium text-[#f0ece4] rounded-[10px] hover:bg-white/[0.04] transition-colors"
                             >
-                                <ShoppingCart size={18} className="text-[#6e6e73]" />
-                                Корзина
+                                <ShoppingCart size={18} className="text-[#6b6b6b]" />
+                                {UI.cart[lang]}
                             </Link>
                             <div className="px-2 mt-2">
                                 <LogoutButton />
@@ -88,24 +95,35 @@ export function MobileMenu({ isOpen, onClose, navLinks, user, profile, firstName
                             <Link
                                 href="/register"
                                 onClick={onClose}
-                                className="w-full h-12 bg-accent text-white text-[16px] font-medium rounded-[10px] hover:bg-[#0a6e56] transition-colors flex items-center justify-center"
+                                className="w-full h-12 bg-[#c9a96e] text-[#0a0a0a] text-[16px] font-semibold rounded-[10px] hover:bg-[#d4b87a] transition-all duration-300 flex items-center justify-center"
                             >
-                                Регистрация
+                                {UI.register[lang]}
                             </Link>
                             <Link
                                 href="/login"
                                 onClick={onClose}
-                                className="w-full h-12 bg-[#f5f5f7] text-[#1d1d1f] text-[16px] font-medium rounded-[10px] border border-black/[0.08] hover:bg-black/[0.04] transition-colors flex items-center justify-center"
+                                className="w-full h-12 bg-[#111111] text-[#f0ece4] text-[16px] font-medium rounded-[10px] border border-white/[0.10] hover:bg-white/[0.04] transition-colors flex items-center justify-center"
                             >
-                                Войти
+                                {UI.login[lang]}
                             </Link>
                         </div>
                     )}
                 </div>
 
                 <div className="flex-1" />
-                <p className="text-center text-[13px] text-[#aeaeb2] mt-6">
-                    © 2025 NomadDrive
+
+                {/* Language toggle */}
+                <button
+                    onClick={() => setLang(lang === 'ru' ? 'kz' : 'ru')}
+                    className="flex items-center justify-center gap-2 mt-6 py-3 bg-[#111111] border border-white/[0.08] rounded-[10px] text-[14px] font-semibold"
+                >
+                    <span className={lang === 'ru' ? 'text-[#f0ece4]' : 'text-[#3d3d3d]'}>РУС</span>
+                    <span className="text-[#3d3d3d]">·</span>
+                    <span className={lang === 'kz' ? 'text-[#f0ece4]' : 'text-[#3d3d3d]'}>ҚАЗ</span>
+                </button>
+
+                <p className="text-center text-[13px] text-[#3d3d3d] mt-4">
+                    © 2026 NomadDrive
                 </p>
 
             </div>

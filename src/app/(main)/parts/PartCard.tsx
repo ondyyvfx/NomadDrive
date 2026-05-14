@@ -26,10 +26,10 @@ export function PartCard({ part, onAddToCart, inCart, priority = false }: Props)
     const isOutOfStock = part.stock === 0
 
     return (
-        <div className="group bg-white border border-black/[0.06] rounded-[16px] shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col">
+        <div className="group bg-[#111111] border border-white/[0.07] rounded-[16px] shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-white/[0.12] transition-all duration-300 overflow-hidden flex flex-col">
 
             {/* Фото */}
-            <div className="relative h-44 bg-[#f5f5f7] overflow-hidden">
+            <div className="relative h-44 bg-[#161616] overflow-hidden">
                 {image ? (
                     <Image
                         src={image}
@@ -37,22 +37,22 @@ export function PartCard({ part, onAddToCart, inCart, priority = false }: Props)
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         priority={priority}
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="object-cover group-hover:scale-105 transition-transform duration-700"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                        <Package size={40} className="text-[#aeaeb2]" />
+                        <Package size={40} className="text-[#3d3d3d]" />
                     </div>
                 )}
 
                 {/* Сток */}
                 <div className="absolute top-3 left-3">
                     {isOutOfStock ? (
-                        <span className="px-2.5 py-1 rounded-full text-[12px] font-medium bg-white/90 backdrop-blur-sm text-[#ff3b30]">
+                        <span className="px-2.5 py-1 rounded-full text-[12px] font-medium bg-black/70 backdrop-blur-sm text-[#ff3b30]">
                             Нет в наличии
                         </span>
                     ) : part.stock <= 5 ? (
-                        <span className="px-2.5 py-1 rounded-full text-[12px] font-medium bg-white/90 backdrop-blur-sm text-[#ff9f0a]">
+                        <span className="px-2.5 py-1 rounded-full text-[12px] font-medium bg-black/70 backdrop-blur-sm text-[#ff9f0a]">
                             Осталось {part.stock} шт.
                         </span>
                     ) : null}
@@ -64,20 +64,20 @@ export function PartCard({ part, onAddToCart, inCart, priority = false }: Props)
 
                 {/* Категория */}
                 {part.category && (
-                    <span className="text-[11px] font-medium text-accent uppercase tracking-wider mb-1.5">
+                    <span className="text-[11px] font-medium text-[#c9a96e] uppercase tracking-wider mb-1.5">
                         {part.category}
                     </span>
                 )}
 
-                <h3 className="text-[15px] font-semibold tracking-tight text-[#1d1d1f] mb-1 line-clamp-2">
+                <h3 className="text-[15px] font-bold tracking-tight text-[#f0ece4] mb-1 line-clamp-2">
                     {part.name}
                 </h3>
 
-                <p className="text-[13px] text-[#6e6e73] mb-1">{part.brand}</p>
+                <p className="text-[13px] text-[#6b6b6b] mb-1">{part.brand}</p>
 
                 {/* Совместимость */}
                 {(part.car_brand || part.car_model) && (
-                    <p className="text-[12px] text-[#aeaeb2] mb-3">
+                    <p className="text-[12px] text-[#3d3d3d] mb-3">
                         {[part.car_brand, part.car_model, part.year_from && `${part.year_from}–${part.year_to ?? '...'}`]
                             .filter(Boolean)
                             .join(' · ')}
@@ -86,24 +86,24 @@ export function PartCard({ part, onAddToCart, inCart, priority = false }: Props)
 
                 {/* OEM */}
                 {part.oem_number && (
-                    <p className="text-[11px] font-mono text-[#aeaeb2] mb-3">
+                    <p className="text-[11px] font-mono text-[#3d3d3d] mb-3">
                         OEM: {part.oem_number}
                     </p>
                 )}
 
-                <div className="mt-auto flex items-center justify-between gap-3 pt-3 border-t border-black/[0.04]">
-                    <p className="text-[18px] font-semibold tracking-tight text-[#1d1d1f]">
+                <div className="mt-auto flex items-center justify-between gap-3 pt-3 border-t border-white/[0.05]">
+                    <p className="text-[18px] font-bold tracking-tight text-[#f0ece4]">
                         {part.price.toLocaleString('ru-RU')} ₸
                     </p>
 
                     <button
                         onClick={handleAdd}
                         disabled={isOutOfStock || inCart}
-                        className={`h-9 px-4 rounded-[8px] text-[13px] font-medium transition-all duration-200 flex items-center gap-2 flex-shrink-0 ${inCart || added
-                                ? 'bg-[#34c759]/[0.1] text-[#34c759]'
+                        className={`h-9 px-4 rounded-[8px] text-[13px] font-semibold transition-all duration-300 flex items-center gap-2 flex-shrink-0 ${inCart || added
+                                ? 'bg-[#34c759]/[0.10] text-[#34c759]'
                                 : isOutOfStock
-                                    ? 'bg-[#f5f5f7] text-[#aeaeb2] cursor-not-allowed'
-                                    : 'bg-accent/[0.08] text-accent hover:bg-accent hover:text-white'
+                                    ? 'bg-[#1a1a1a] text-[#3d3d3d] cursor-not-allowed'
+                                    : 'bg-[#c9a96e]/[0.08] text-[#c9a96e] hover:bg-[#c9a96e] hover:text-[#0a0a0a]'
                             }`}
                     >
                         {inCart || added ? (

@@ -10,14 +10,14 @@ const links = [
 
 export function Footer() {
     return (
-        <footer className="border-t border-black/[0.06] bg-white">
+        <footer className="border-t border-white/[0.06] bg-[#0a0a0a]">
             <div className="max-w-[1200px] mx-auto px-5 py-12">
 
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
 
                     {/* Лого */}
-                    <Link href="/" className="font-semibold text-xl tracking-tight flex-shrink-0">
-                        Nomad<span className="text-accent">Drive</span>
+                    <Link href="/" className="font-bold text-xl tracking-[-0.04em] flex-shrink-0 text-[#f0ece4]">
+                        Nomad<span className="text-[#c9a96e]">Drive</span>
                     </Link>
 
                     {/* Ссылки */}
@@ -26,7 +26,7 @@ export function Footer() {
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className="text-[15px] text-[#6e6e73] hover:text-[#1d1d1f] transition-colors duration-150"
+                                className="text-[15px] text-[#6b6b6b] hover:text-[#f0ece4] transition-colors duration-200"
                             >
                                 {link.label}
                             </Link>
@@ -35,11 +35,11 @@ export function Footer() {
 
                 </div>
 
-                <div className="mt-10 pt-6 border-t border-black/[0.06] flex flex-col md:flex-row items-center justify-between gap-2">
-                    <p className="text-[14px] text-[#aeaeb2]">
+                <div className="mt-10 pt-6 border-t border-white/[0.06] flex flex-col md:flex-row items-center justify-between gap-2">
+                    <p className="text-[14px] text-[#3d3d3d]">
                         © 2025 NomadDrive
                     </p>
-                    <p className="text-[14px] text-[#aeaeb2]">
+                    <p className="text-[14px] text-[#3d3d3d]">
                         Алматы, Казахстан
                     </p>
                 </div>

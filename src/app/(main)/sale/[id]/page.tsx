@@ -14,9 +14,9 @@ const fuelLabel: Record<string, string> = {
     petrol: 'Бензин', diesel: 'Дизель', electric: 'Электро', hybrid: 'Гибрид',
 }
 const statusConfig: Record<string, { label: string; classes: string }> = {
-    available: { label: 'В наличии', classes: 'bg-[#34c759]/[0.08] text-[#34c759]' },
-    sold: { label: 'Продан', classes: 'bg-[#ff3b30]/[0.08] text-[#ff3b30]' },
-    reserved: { label: 'Резерв', classes: 'bg-[#ff9f0a]/[0.08] text-[#ff9f0a]' },
+    available: { label: 'В наличии', classes: 'text-[#34c759]' },
+    sold: { label: 'Продан', classes: 'text-[#ff3b30]' },
+    reserved: { label: 'Резерв', classes: 'text-[#ff9f0a]' },
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -69,13 +69,13 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
             <div className="flex items-center gap-2 mb-6 fade-in">
                 <Link
                     href="/sale"
-                    className="inline-flex items-center gap-1.5 text-[14px] text-[#6e6e73] hover:text-[#1d1d1f] transition-colors"
+                    className="inline-flex items-center gap-1.5 text-[14px] text-[#6b6b6b] hover:text-[#f0ece4] transition-colors"
                 >
                     <ChevronLeft size={16} />
                     Продажа авто
                 </Link>
-                <span className="text-[#aeaeb2]">/</span>
-                <span className="text-[14px] text-[#1d1d1f]">{car.brand} {car.model}</span>
+                <span className="text-[#3d3d3d]">/</span>
+                <span className="text-[14px] text-[#f0ece4]">{car.brand} {car.model}</span>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8">
@@ -85,7 +85,7 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
 
                     {/* Галерея */}
                     <div className="fade-in">
-                        <div className="relative h-[280px] md:h-[420px] rounded-[16px] overflow-hidden bg-[#f5f5f7]">
+                        <div className="relative h-[280px] md:h-[420px] rounded-[16px] overflow-hidden bg-[#161616]">
                             {images[0] ? (
                                 <Image
                                     src={images[0]}
@@ -99,7 +99,7 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
                                 <div className="w-full h-full flex items-center justify-center text-[80px]">🚗</div>
                             )}
                             <div className="absolute top-4 left-4">
-                                <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-[13px] font-medium bg-white/90 backdrop-blur-sm ${status.classes}`}>
+                                <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-[13px] font-medium bg-black/70 backdrop-blur-sm ${status.classes}`}>
                                     {status.label}
                                 </span>
                             </div>
@@ -107,7 +107,7 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
                         {images.length > 1 && (
                             <div className="flex gap-3 mt-3">
                                 {images.slice(1, 5).map((img: string, i: number) => (
-                                    <div key={i} className="relative h-20 flex-1 rounded-[10px] overflow-hidden bg-[#f5f5f7]">
+                                    <div key={i} className="relative h-20 flex-1 rounded-[10px] overflow-hidden bg-[#161616]">
                                         <Image
                                             src={img} alt="" fill
                                             sizes="20vw"
@@ -121,25 +121,25 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
 
                     {/* Заголовок */}
                     <div className="fade-in-up">
-                        <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mb-1">
+                        <h1 className="text-2xl md:text-3xl font-bold tracking-[-0.04em] mb-1 text-[#f0ece4]">
                             {car.brand} {car.model} {car.year}
                         </h1>
                         {car.vin && (
-                            <p className="text-[13px] text-[#aeaeb2]">VIN: {car.vin}</p>
+                            <p className="text-[13px] text-[#3d3d3d]">VIN: {car.vin}</p>
                         )}
                     </div>
 
                     {/* Характеристики */}
-                    <div className="bg-[#f5f5f7] rounded-[14px] p-5 fade-in-up">
-                        <h2 className="text-[16px] font-semibold tracking-tight mb-4">Характеристики</h2>
+                    <div className="bg-[#111111] border border-white/[0.07] rounded-[14px] p-5 fade-in-up">
+                        <h2 className="text-[16px] font-bold tracking-tight mb-4 text-[#f0ece4]">Характеристики</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                             {specs.map(({ icon: Icon, label, value }) => (
                                 <div key={label} className="flex flex-col gap-1.5">
-                                    <div className="flex items-center gap-1.5 text-[#6e6e73]">
+                                    <div className="flex items-center gap-1.5 text-[#6b6b6b]">
                                         <Icon size={14} />
                                         <span className="text-[12px]">{label}</span>
                                     </div>
-                                    <p className="text-[14px] font-semibold text-[#1d1d1f]">{value}</p>
+                                    <p className="text-[14px] font-bold text-[#f0ece4]">{value}</p>
                                 </div>
                             ))}
                         </div>
@@ -148,8 +148,8 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
                     {/* Описание */}
                     {car.description && (
                         <div className="fade-in-up">
-                            <h2 className="text-[16px] font-semibold tracking-tight mb-3">Описание</h2>
-                            <p className="text-[15px] text-[#6e6e73] leading-relaxed">{car.description}</p>
+                            <h2 className="text-[16px] font-bold tracking-tight mb-3 text-[#f0ece4]">Описание</h2>
+                            <p className="text-[15px] text-[#6b6b6b] leading-relaxed">{car.description}</p>
                         </div>
                     )}
 
@@ -161,9 +161,9 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
                             { icon: CheckCircle2, text: 'Полная история обслуживания' },
                             { icon: Shield, text: 'Безопасная сделка' },
                         ].map(({ icon: Icon, text }) => (
-                            <div key={text} className="flex items-center gap-3 p-4 bg-white border border-black/[0.06] rounded-[12px]">
-                                <Icon size={16} className="text-accent flex-shrink-0" />
-                                <span className="text-[13px] font-medium">{text}</span>
+                            <div key={text} className="flex items-center gap-3 p-4 bg-[#111111] border border-white/[0.07] rounded-[12px]">
+                                <Icon size={16} className="text-[#c9a96e] flex-shrink-0" />
+                                <span className="text-[13px] font-medium text-[#f0ece4]">{text}</span>
                             </div>
                         ))}
                     </div>
@@ -172,13 +172,13 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
 
                 {/* Правая колонка — цена и контакт */}
                 <div className="lg:sticky lg:top-[76px] h-fit">
-                    <div className="bg-white border border-black/[0.08] rounded-[20px] shadow-md overflow-hidden scale-in">
+                    <div className="bg-[#111111] border border-white/[0.08] rounded-[20px] shadow-lg overflow-hidden scale-in">
 
-                        <div className="px-6 pt-6 pb-5 border-b border-black/[0.06]">
-                            <p className="text-[28px] font-semibold tracking-tight">
+                        <div className="px-6 pt-6 pb-5 border-b border-white/[0.06]">
+                            <p className="text-[28px] font-bold tracking-tight text-[#f0ece4]">
                                 {car.price.toLocaleString('ru-RU')} ₸
                             </p>
-                            <p className="text-[13px] text-[#6e6e73] mt-0.5">
+                            <p className="text-[13px] text-[#6b6b6b] mt-0.5">
                                 ≈ {Math.round(car.price / 450).toLocaleString('ru-RU')} $
                             </p>
                         </div>
@@ -192,17 +192,17 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
                                     { label: 'Пробег', value: `${(car.mileage / 1000).toFixed(0)}к` },
                                     { label: 'КПП', value: car.transmission === 'auto' ? 'Авт.' : 'Мех.' },
                                 ].map(({ label, value }) => (
-                                    <div key={label} className="text-center p-2 bg-[#f5f5f7] rounded-[10px]">
-                                        <p className="text-[13px] font-semibold text-[#1d1d1f]">{value}</p>
-                                        <p className="text-[11px] text-[#6e6e73]">{label}</p>
+                                    <div key={label} className="text-center p-2 bg-[#161616] rounded-[10px] border border-white/[0.05]">
+                                        <p className="text-[13px] font-bold text-[#f0ece4]">{value}</p>
+                                        <p className="text-[11px] text-[#6b6b6b]">{label}</p>
                                     </div>
                                 ))}
                             </div>
 
                             <button
-                                className={`w-full h-12 font-semibold rounded-[12px] transition-all duration-200 flex items-center justify-center gap-2 text-[15px] ${car.status === 'available'
-                                        ? 'bg-accent text-white hover:bg-[#0a6e56]'
-                                        : 'bg-[#f5f5f7] text-[#aeaeb2] cursor-not-allowed'
+                                className={`w-full h-12 font-bold rounded-[12px] transition-all duration-300 flex items-center justify-center gap-2 text-[15px] ${car.status === 'available'
+                                        ? 'bg-[#c9a96e] text-[#0a0a0a] hover:bg-[#d4b87a]'
+                                        : 'bg-[#1a1a1a] text-[#3d3d3d] cursor-not-allowed border border-white/[0.06]'
                                     }`}
                                 disabled={car.status !== 'available'}
                             >
@@ -210,12 +210,12 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
                                 {car.status === 'available' ? 'Связаться с продавцом' : status.label}
                             </button>
 
-                            <button className="w-full h-12 bg-[#f5f5f7] text-[#1d1d1f] font-medium rounded-[12px] border border-black/[0.08] hover:bg-black/[0.04] transition-colors text-[15px] flex items-center justify-center gap-2">
+                            <button className="w-full h-12 bg-[#1a1a1a] text-[#f0ece4] font-medium rounded-[12px] border border-white/[0.08] hover:bg-white/[0.04] transition-colors text-[15px] flex items-center justify-center gap-2">
                                 <MessageCircle size={16} />
                                 Написать в чат
                             </button>
 
-                            <p className="text-[12px] text-[#aeaeb2] text-center">
+                            <p className="text-[12px] text-[#3d3d3d] text-center">
                                 Безопасная сделка через платформу NomadDrive
                             </p>
                         </div>
@@ -227,7 +227,7 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
             {/* Похожие */}
             {similar && similar.length > 0 && (
                 <div className="mt-16 fade-in-up">
-                    <h2 className="text-[20px] font-semibold tracking-tight mb-6">
+                    <h2 className="text-[20px] font-bold tracking-tight mb-6 text-[#f0ece4]">
                         Другие {car.brand}
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 stagger-children">
@@ -235,25 +235,25 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
                             <Link
                                 key={s.id}
                                 href={`/sale/${s.id}`}
-                                className="group bg-white border border-black/[0.06] rounded-[14px] overflow-hidden hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+                                className="group bg-[#111111] border border-white/[0.07] rounded-[14px] overflow-hidden hover:shadow-lg hover:-translate-y-1 hover:border-white/[0.12] transition-all duration-300"
                             >
-                                <div className="relative h-40 bg-[#f5f5f7]">
+                                <div className="relative h-40 bg-[#161616]">
                                     {s.image_urls?.[0] ? (
                                         <Image
                                             src={s.image_urls[0]} alt={`${s.brand} ${s.model}`}
                                             fill sizes="33vw"
-                                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                                            className="object-cover group-hover:scale-105 transition-transform duration-700"
                                         />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-[40px]">🚗</div>
                                     )}
                                 </div>
                                 <div className="p-4">
-                                    <p className="font-semibold text-[15px] tracking-tight">{s.brand} {s.model}</p>
-                                    <p className="text-[13px] text-[#6e6e73] mt-0.5">
+                                    <p className="font-bold text-[15px] tracking-tight text-[#f0ece4]">{s.brand} {s.model}</p>
+                                    <p className="text-[13px] text-[#6b6b6b] mt-0.5">
                                         {s.year} · {s.mileage.toLocaleString('ru-RU')} км
                                     </p>
-                                    <p className="text-[15px] font-semibold text-accent mt-2">
+                                    <p className="text-[15px] font-bold text-[#c9a96e] mt-2">
                                         {s.price.toLocaleString('ru-RU')} ₸
                                     </p>
                                 </div>

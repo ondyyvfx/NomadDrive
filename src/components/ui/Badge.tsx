@@ -12,8 +12,8 @@ const variants: Record<BadgeVariant, string> = {
     success: 'bg-[#34c759]/10 text-[#34c759]',
     warning: 'bg-[#ff9f0a]/10 text-[#ff9f0a]',
     danger: 'bg-[#ff3b30]/10 text-[#ff3b30]',
-    accent: 'bg-accent/10 text-accent',
-    default: 'bg-surface text-[#6e6e73] border border-black/10',
+    accent: 'bg-[#c9a96e]/10 text-[#c9a96e]',
+    default: 'bg-[#1a1a1a] text-[#6b6b6b] border border-white/[0.08]',
 }
 
 export function Badge({ variant = 'default', children, className }: BadgeProps) {

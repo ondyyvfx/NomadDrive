@@ -21,7 +21,7 @@ export default async function CatalogPage() {
                 <h1 className="text-3xl md:text-4xl font-semibold tracking-tight mb-2">
                     Аренда автомобилей
                 </h1>
-                <p className="text-[#6e6e73] text-[16px]">
+                <p className="text-[#6b6b6b] text-[16px]">
                     {cars?.length ?? 0} автомобилей доступно прямо сейчас
                 </p>
             </div>

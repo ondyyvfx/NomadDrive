@@ -46,19 +46,18 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
     return (
         <div className="flex flex-col gap-5 fade-in-up">
 
-            {/* Аватар */}
-            <div className="bg-white border border-black/[0.06] rounded-[16px] p-6">
+            <div className="bg-[#111111] border border-white/[0.07] rounded-[16px] p-6">
                 <div className="flex items-center gap-5">
-                    <div className="w-16 h-16 bg-accent/[0.08] rounded-full flex items-center justify-center flex-shrink-0">
-                        <User size={28} className="text-accent" />
+                    <div className="w-16 h-16 bg-[#c9a96e]/[0.08] rounded-full flex items-center justify-center flex-shrink-0">
+                        <User size={28} className="text-[#c9a96e]" />
                     </div>
                     <div>
-                        <p className="text-[17px] font-semibold tracking-tight">
+                        <p className="text-[17px] font-bold tracking-tight text-[#f0ece4]">
                             {profile?.full_name ?? 'Не указано'}
                         </p>
-                        <p className="text-[13px] text-[#6e6e73]">{email}</p>
+                        <p className="text-[13px] text-[#6b6b6b]">{email}</p>
                         {profile?.role === 'admin' && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-accent/[0.08] text-accent mt-1">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#c9a96e]/[0.08] text-[#c9a96e] mt-1">
                                 Администратор
                             </span>
                         )}
@@ -66,16 +65,14 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
                 </div>
             </div>
 
-            {/* Форма */}
-            <div className="bg-white border border-black/[0.06] rounded-[16px] p-6">
-                <h2 className="text-[15px] font-semibold tracking-tight mb-5">
+            <div className="bg-[#111111] border border-white/[0.07] rounded-[16px] p-6">
+                <h2 className="text-[15px] font-bold tracking-tight mb-5 text-[#f0ece4]">
                     Личные данные
                 </h2>
                 <div className="flex flex-col gap-4">
 
-                    {/* Email — readonly */}
                     <div className="flex flex-col gap-1.5">
-                        <label className="text-[13px] font-medium text-[#6e6e73] flex items-center gap-1.5">
+                        <label className="text-[13px] font-medium text-[#6b6b6b] flex items-center gap-1.5">
                             <Mail size={13} />
                             Email
                         </label>
@@ -83,13 +80,12 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
                             type="email"
                             value={email}
                             disabled
-                            className="w-full h-11 px-3.5 bg-[#f5f5f7] border border-black/[0.08] rounded-[10px] text-[15px] text-[#aeaeb2] cursor-not-allowed"
+                            className="w-full h-11 px-3.5 bg-[#161616] border border-white/[0.06] rounded-[10px] text-[15px] text-[#3d3d3d] cursor-not-allowed"
                         />
                     </div>
 
-                    {/* Имя */}
                     <div className="flex flex-col gap-1.5">
-                        <label className="text-[13px] font-medium text-[#6e6e73] flex items-center gap-1.5">
+                        <label className="text-[13px] font-medium text-[#6b6b6b] flex items-center gap-1.5">
                             <User size={13} />
                             Имя и фамилия
                         </label>
@@ -98,13 +94,12 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
                             value={fullName}
                             onChange={e => setFullName(e.target.value)}
                             placeholder="Алексей Иванов"
-                            className="w-full h-11 px-3.5 bg-[#f5f5f7] border border-black/[0.08] rounded-[10px] text-[15px] text-[#1d1d1f] placeholder:text-[#aeaeb2] outline-none focus:border-accent focus:ring-3 focus:ring-[#0a5f4a]/[0.08] focus:bg-white transition-all"
+                            className="w-full h-11 px-3.5 bg-[#111111] border border-white/[0.10] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.12] focus:bg-[#161616] transition-all"
                         />
                     </div>
 
-                    {/* Телефон */}
                     <div className="flex flex-col gap-1.5">
-                        <label className="text-[13px] font-medium text-[#6e6e73] flex items-center gap-1.5">
+                        <label className="text-[13px] font-medium text-[#6b6b6b] flex items-center gap-1.5">
                             <Phone size={13} />
                             Телефон
                         </label>
@@ -113,7 +108,7 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
                             value={phone}
                             onChange={e => setPhone(e.target.value)}
                             placeholder="+7 (777) 123-45-67"
-                            className="w-full h-11 px-3.5 bg-[#f5f5f7] border border-black/[0.08] rounded-[10px] text-[15px] text-[#1d1d1f] placeholder:text-[#aeaeb2] outline-none focus:border-accent focus:ring-3 focus:ring-[#0a5f4a]/[0.08] focus:bg-white transition-all"
+                            className="w-full h-11 px-3.5 bg-[#111111] border border-white/[0.10] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.12] focus:bg-[#161616] transition-all"
                         />
                     </div>
 
@@ -131,10 +126,10 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
                     <button
                         onClick={handleSave}
                         disabled={loading}
-                        className="w-full h-11 bg-accent text-white font-medium rounded-[10px] hover:bg-[#0a6e56] transition-all duration-200 flex items-center justify-center gap-2 text-[15px] disabled:opacity-50 mt-1"
+                        className="w-full h-11 bg-[#c9a96e] text-[#0a0a0a] font-semibold rounded-[10px] hover:bg-[#d4b87a] transition-all duration-300 flex items-center justify-center gap-2 text-[15px] disabled:opacity-50 mt-1"
                     >
                         {loading && (
-                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            <span className="w-4 h-4 border-2 border-[#0a0a0a]/30 border-t-[#0a0a0a] rounded-full animate-spin" />
                         )}
                         {loading ? 'Сохраняем...' : 'Сохранить изменения'}
                     </button>

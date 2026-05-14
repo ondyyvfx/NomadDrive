@@ -78,14 +78,14 @@ export function CatalogClient({ cars, brands }: Props) {
                 <button
                     onClick={() => setShowFilters(true)}
                     className={`inline-flex items-center gap-2 h-10 px-4 rounded-[10px] border text-[14px] font-medium transition-all duration-200 ${hasActiveFilters
-                        ? 'bg-accent text-white border-accent'
-                        : 'bg-white text-[#1d1d1f] border-black/[0.1] hover:border-black/[0.2]'
+                        ? 'bg-[#c9a96e] text-[#0a0a0a] border-[#c9a96e]'
+                        : 'bg-[#111111] text-[#f0ece4] border-white/[0.10] hover:border-white/[0.20]'
                         }`}
                 >
                     <SlidersHorizontal size={15} />
                     Фильтры
                     {hasActiveFilters && (
-                        <span className="w-5 h-5 bg-white/20 rounded-full text-[11px] flex items-center justify-center">
+                        <span className="w-5 h-5 bg-[#0a0a0a]/20 rounded-full text-[11px] flex items-center justify-center">
                             {Object.values(applied).filter(v => v !== '').length}
                         </span>
                     )}
@@ -96,7 +96,7 @@ export function CatalogClient({ cars, brands }: Props) {
                     {hasActiveFilters && (
                         <button
                             onClick={resetFilters}
-                            className="inline-flex items-center gap-1.5 h-10 px-3 text-[13px] text-[#6e6e73] hover:text-[#ff3b30] transition-colors"
+                            className="inline-flex items-center gap-1.5 h-10 px-3 text-[13px] text-[#6b6b6b] hover:text-[#ff3b30] transition-colors"
                         >
                             <X size={14} />
                             Сбросить
@@ -107,17 +107,17 @@ export function CatalogClient({ cars, brands }: Props) {
                     <div className="relative">
                         <button
                             onClick={() => setShowSortSheet(true)}
-                            className="inline-flex items-center gap-2 h-10 px-4 bg-white border border-black/[0.1] hover:border-black/[0.2] rounded-[10px] text-[14px] font-medium text-[#1d1d1f] transition-all duration-200 md:hidden"
+                            className="inline-flex items-center gap-2 h-10 px-4 bg-[#111111] border border-white/[0.10] hover:border-white/[0.20] rounded-[10px] text-[14px] font-medium text-[#f0ece4] transition-all duration-200 md:hidden"
                         >
                             {sortOptions.find(o => o.value === sortBy)?.label}
-                            <ChevronDown size={14} className="text-[#6e6e73]" />
+                            <ChevronDown size={14} className="text-[#6b6b6b]" />
                         </button>
 
                         {/* Desktop сортировка — select */}
                         <select
                             value={sortBy}
                             onChange={e => setSortBy(e.target.value)}
-                            className="hidden md:block h-10 px-4 bg-white border border-black/[0.1] hover:border-black/[0.2] rounded-[10px] text-[14px] font-medium text-[#1d1d1f] outline-none cursor-pointer transition-all duration-200"
+                            className="hidden md:block h-10 px-4 bg-[#111111] border border-white/[0.10] hover:border-white/[0.20] rounded-[10px] text-[14px] font-medium text-[#f0ece4] outline-none cursor-pointer transition-all duration-200"
                         >
                             {sortOptions.map(o => (
                                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -128,8 +128,8 @@ export function CatalogClient({ cars, brands }: Props) {
             </div>
 
             {/* ── Результат ── */}
-            <p className="text-[13px] text-[#6e6e73] mb-4">
-                Найдено: <span className="text-[#1d1d1f] font-medium">{filtered.length}</span> авто
+            <p className="text-[13px] text-[#6b6b6b] mb-4">
+                Найдено: <span className="text-[#f0ece4] font-medium">{filtered.length}</span> авто
             </p>
 
             {/* ── Grid ── */}
@@ -142,15 +142,15 @@ export function CatalogClient({ cars, brands }: Props) {
             ) : (
                 <div className="text-center py-20 fade-in">
                     <p className="text-[40px] mb-4">🚗</p>
-                    <p className="text-[18px] font-semibold tracking-tight mb-2">
+                    <p className="text-[18px] font-bold tracking-tight mb-2 text-[#f0ece4]">
                         Ничего не найдено
                     </p>
-                    <p className="text-[14px] text-[#6e6e73] mb-6">
+                    <p className="text-[14px] text-[#6b6b6b] mb-6">
                         Попробуйте изменить фильтры
                     </p>
                     <button
                         onClick={resetFilters}
-                        className="h-10 px-6 bg-accent text-white text-[14px] font-medium rounded-[10px] hover:bg-[#0a6e56] transition-colors"
+                        className="h-10 px-6 bg-[#c9a96e] text-[#0a0a0a] text-[14px] font-semibold rounded-[10px] hover:bg-[#d4b87a] transition-all duration-300"
                     >
                         Сбросить фильтры
                     </button>
@@ -163,12 +163,12 @@ export function CatalogClient({ cars, brands }: Props) {
                     {/* Backdrop */}
                     <div
                         className="fixed inset-0 z-40"
-                        style={{ background: 'rgba(0,0,0,0.25)' }}
+                        style={{ background: 'rgba(0,0,0,0.6)' }}
                         onClick={() => setShowFilters(false)}
                     />
 
                     {/* Desktop — боковая панель справа */}
-                    <div className="hidden md:flex fixed top-0 right-0 h-full w-[340px] bg-white z-50 flex-col shadow-lg slide-in-from-right">
+                    <div className="hidden md:flex fixed top-0 right-0 h-full w-[340px] bg-[#111111] z-50 flex-col shadow-lg border-l border-white/[0.06] slide-in-from-right">
                         <FilterPanel
                             filters={filters}
                             setFilters={setFilters}
@@ -180,7 +180,7 @@ export function CatalogClient({ cars, brands }: Props) {
                     </div>
 
                     {/* Mobile — bottom sheet */}
-                    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-[20px] shadow-lg max-h-[85vh] flex flex-col slide-in-from-bottom">
+                    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#111111] rounded-t-[20px] shadow-lg max-h-[85vh] flex flex-col border-t border-white/[0.06] slide-in-from-bottom">
                         <FilterPanel
                             filters={filters}
                             setFilters={setFilters}
@@ -198,20 +198,20 @@ export function CatalogClient({ cars, brands }: Props) {
                 <>
                     <div
                         className="md:hidden fixed inset-0 z-40"
-                        style={{ background: 'rgba(0,0,0,0.25)' }}
+                        style={{ background: 'rgba(0,0,0,0.6)' }}
                         onClick={() => setShowSortSheet(false)}
                     />
-                    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-[20px] px-5 pt-5 pb-8 shadow-lg slide-in-from-bottom">
-                        <div className="w-10 h-1 bg-black/[0.1] rounded-full mx-auto mb-6" />
-                        <p className="text-[16px] font-semibold tracking-tight mb-4">Сортировка</p>
+                    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#111111] rounded-t-[20px] px-5 pt-5 pb-8 shadow-lg border-t border-white/[0.06] slide-in-from-bottom">
+                        <div className="w-10 h-1 bg-white/[0.10] rounded-full mx-auto mb-6" />
+                        <p className="text-[16px] font-bold tracking-tight mb-4 text-[#f0ece4]">Сортировка</p>
                         <div className="flex flex-col gap-2">
                             {sortOptions.map(o => (
                                 <button
                                     key={o.value}
                                     onClick={() => { setSortBy(o.value); setShowSortSheet(false) }}
                                     className={`w-full h-12 rounded-[12px] text-[15px] font-medium transition-colors text-left px-4 ${sortBy === o.value
-                                        ? 'bg-accent/[0.08] text-accent'
-                                        : 'hover:bg-[#f5f5f7] text-[#1d1d1f]'
+                                        ? 'bg-[#c9a96e]/[0.10] text-[#c9a96e]'
+                                        : 'hover:bg-white/[0.04] text-[#f0ece4]'
                                         }`}
                                 >
                                     {o.label}
@@ -245,13 +245,13 @@ function FilterPanel({ filters, setFilters, brands, onApply, onClose, onReset }:
     return (
         <div className="flex flex-col h-full">
             {/* Header */}
-            <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-black/[0.06] flex-shrink-0">
+            <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-white/[0.06] flex-shrink-0">
                 {/* Mobile handle */}
-                <div className="md:hidden w-10 h-1 bg-black/[0.1] rounded-full absolute left-1/2 -translate-x-1/2 top-3" />
-                <p className="text-[17px] font-semibold tracking-tight">Фильтры</p>
+                <div className="md:hidden w-10 h-1 bg-white/[0.10] rounded-full absolute left-1/2 -translate-x-1/2 top-3" />
+                <p className="text-[17px] font-bold tracking-tight text-[#f0ece4]">Фильтры</p>
                 <button
                     onClick={onClose}
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-black/[0.06] text-[#6e6e73] transition-colors"
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/[0.06] text-[#6b6b6b] transition-colors"
                 >
                     <X size={17} />
                 </button>
@@ -311,7 +311,7 @@ function FilterPanel({ filters, setFilters, brands, onApply, onClose, onReset }:
 
                 {/* Цена */}
                 <div>
-                    <p className="text-[13px] font-medium text-[#6e6e73] mb-3">
+                    <p className="text-[13px] font-medium text-[#6b6b6b] mb-3">
                         Цена за сутки (₸)
                     </p>
                     <div className="flex gap-3">
@@ -320,14 +320,14 @@ function FilterPanel({ filters, setFilters, brands, onApply, onClose, onReset }:
                             value={filters.priceMin}
                             onChange={e => set('priceMin', e.target.value)}
                             placeholder="От"
-                            className="w-full h-11 px-3.5 bg-[#f5f5f7] border border-black/[0.08] rounded-[10px] text-[15px] outline-none focus:border-accent focus:ring-3 focus:ring-[#0a5f4a]/[0.08] focus:bg-white transition-all"
+                            className="w-full h-11 px-3.5 bg-[#161616] border border-white/[0.08] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] transition-all"
                         />
                         <input
                             type="number"
                             value={filters.priceMax}
                             onChange={e => set('priceMax', e.target.value)}
                             placeholder="До"
-                            className="w-full h-11 px-3.5 bg-[#f5f5f7] border border-black/[0.08] rounded-[10px] text-[15px] outline-none focus:border-accent focus:ring-3 focus:ring-[#0a5f4a]/[0.08] focus:bg-white transition-all"
+                            className="w-full h-11 px-3.5 bg-[#161616] border border-white/[0.08] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] transition-all"
                         />
                     </div>
                 </div>
@@ -335,16 +335,16 @@ function FilterPanel({ filters, setFilters, brands, onApply, onClose, onReset }:
             </div>
 
             {/* Footer */}
-            <div className="px-6 py-4 border-t border-black/[0.06] flex gap-3 flex-shrink-0">
+            <div className="px-6 py-4 border-t border-white/[0.06] flex gap-3 flex-shrink-0">
                 <button
                     onClick={onReset}
-                    className="flex-1 h-11 bg-[#f5f5f7] text-[#1d1d1f] font-medium rounded-[10px] border border-black/[0.08] hover:bg-black/[0.04] transition-colors text-[15px]"
+                    className="flex-1 h-11 bg-[#1a1a1a] text-[#f0ece4] font-medium rounded-[10px] border border-white/[0.08] hover:bg-white/[0.04] transition-colors text-[15px]"
                 >
                     Сбросить
                 </button>
                 <button
                     onClick={onApply}
-                    className="flex-1 h-11 bg-accent text-white font-medium rounded-[10px] hover:bg-[#0a6e56] transition-colors text-[15px]"
+                    className="flex-1 h-11 bg-[#c9a96e] text-[#0a0a0a] font-semibold rounded-[10px] hover:bg-[#d4b87a] transition-all duration-300 text-[15px]"
                 >
                     Применить
                 </button>
@@ -365,13 +365,13 @@ function FilterSelect({
 }) {
     return (
         <div>
-            <p className="text-[13px] font-medium text-[#6e6e73] mb-2">{label}</p>
+            <p className="text-[13px] font-medium text-[#6b6b6b] mb-2">{label}</p>
             <div className="flex flex-wrap gap-2">
                 <button
                     onClick={() => onChange('')}
                     className={`h-9 px-3.5 rounded-[8px] text-[13px] font-medium border transition-all duration-150 ${value === ''
-                        ? 'bg-accent text-white border-accent'
-                        : 'bg-white text-[#6e6e73] border-black/[0.1] hover:border-black/[0.2]'
+                        ? 'bg-[#c9a96e] text-[#0a0a0a] border-[#c9a96e]'
+                        : 'bg-[#1a1a1a] text-[#6b6b6b] border-white/[0.10] hover:border-white/[0.20]'
                         }`}
                 >
                     {placeholder}
@@ -381,8 +381,8 @@ function FilterSelect({
                         key={o.value}
                         onClick={() => onChange(o.value)}
                         className={`h-9 px-3.5 rounded-[8px] text-[13px] font-medium border transition-all duration-150 ${value === o.value
-                            ? 'bg-accent text-white border-accent'
-                            : 'bg-white text-[#6e6e73] border-black/[0.1] hover:border-black/[0.2]'
+                            ? 'bg-[#c9a96e] text-[#0a0a0a] border-[#c9a96e]'
+                            : 'bg-[#1a1a1a] text-[#6b6b6b] border-white/[0.10] hover:border-white/[0.20]'
                             }`}
                     >
                         {o.label}

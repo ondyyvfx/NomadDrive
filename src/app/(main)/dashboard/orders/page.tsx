@@ -8,7 +8,7 @@ export const metadata = { title: 'Мои заказы' }
 const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
     pending: { label: 'В обработке', color: 'text-[#ff9f0a] bg-[#ff9f0a]/[0.08]', icon: <Clock size={13} /> },
     confirmed: { label: 'Подтверждён', color: 'text-[#34c759] bg-[#34c759]/[0.08]', icon: <CheckCircle2 size={13} /> },
-    shipped: { label: 'В доставке', color: 'text-accent bg-accent/[0.08]', icon: <CheckCircle2 size={13} /> },
+    shipped: { label: 'В доставке', color: 'text-[#c9a96e] bg-[#c9a96e]/[0.08]', icon: <CheckCircle2 size={13} /> },
     delivered: { label: 'Доставлен', color: 'text-[#34c759] bg-[#34c759]/[0.08]', icon: <CheckCircle2 size={13} /> },
     cancelled: { label: 'Отменён', color: 'text-[#ff3b30] bg-[#ff3b30]/[0.08]', icon: <XCircle size={13} /> },
 }
@@ -29,29 +29,29 @@ export default async function OrdersPage() {
             <div className="flex items-center gap-2 mb-8 fade-in">
                 <Link
                     href="/dashboard"
-                    className="inline-flex items-center gap-1.5 text-[14px] text-[#6e6e73] hover:text-[#1d1d1f] transition-colors"
+                    className="inline-flex items-center gap-1.5 text-[14px] text-[#6b6b6b] hover:text-[#f0ece4] transition-colors"
                 >
                     <ChevronLeft size={16} />
                     Кабинет
                 </Link>
-                <span className="text-[#aeaeb2]">/</span>
-                <span className="text-[14px]">Заказы</span>
+                <span className="text-[#3d3d3d]">/</span>
+                <span className="text-[14px] text-[#f0ece4]">Заказы</span>
             </div>
 
-            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mb-8 fade-in">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-[-0.04em] mb-8 fade-in text-[#f0ece4]">
                 Мои заказы
             </h1>
 
             {!orders?.length ? (
                 <div className="text-center py-20 fade-in">
-                    <div className="w-16 h-16 bg-[#f5f5f7] rounded-full flex items-center justify-center mx-auto mb-4">
-                        <ShoppingBag size={28} className="text-[#aeaeb2]" />
+                    <div className="w-16 h-16 bg-[#161616] rounded-full flex items-center justify-center mx-auto mb-4">
+                        <ShoppingBag size={28} className="text-[#3d3d3d]" />
                     </div>
-                    <p className="text-[18px] font-semibold tracking-tight mb-2">Нет заказов</p>
-                    <p className="text-[14px] text-[#6e6e73] mb-6">Оформите заказ в каталоге запчастей</p>
+                    <p className="text-[18px] font-bold tracking-tight mb-2 text-[#f0ece4]">Нет заказов</p>
+                    <p className="text-[14px] text-[#6b6b6b] mb-6">Оформите заказ в каталоге запчастей</p>
                     <Link
                         href="/parts"
-                        className="inline-flex h-11 px-6 bg-accent text-white font-medium rounded-[10px] hover:bg-[#0a6e56] transition-colors items-center text-[14px]"
+                        className="inline-flex h-11 px-6 bg-[#c9a96e] text-[#0a0a0a] font-semibold rounded-[10px] hover:bg-[#d4b87a] transition-colors items-center text-[14px]"
                     >
                         Перейти в каталог
                     </Link>
@@ -65,36 +65,36 @@ export default async function OrdersPage() {
                             <Link
                                 key={o.id}
                                 href={`/dashboard/orders/${o.id}`}
-                                className="group bg-white border border-black/[0.06] rounded-[16px] p-5 flex items-center gap-5 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+                                className="group bg-[#111111] border border-white/[0.07] rounded-[16px] p-5 flex items-center gap-5 hover:shadow-lg hover:-translate-y-0.5 hover:border-white/[0.12] transition-all duration-300"
                             >
                                 <div className="w-14 h-14 bg-[#b8860b]/[0.07] rounded-[12px] flex items-center justify-center flex-shrink-0">
                                     <ShoppingBag size={24} className="text-[#b8860b]" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                                        <p className="text-[16px] font-semibold tracking-tight">
+                                        <p className="text-[16px] font-bold tracking-tight text-[#f0ece4]">
                                             Заказ #{o.id.slice(0, 8).toUpperCase()}
                                         </p>
                                         <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[12px] font-medium ${s.color}`}>
                                             {s.icon}{s.label}
                                         </span>
                                     </div>
-                                    <p className="text-[13px] text-[#6e6e73]">
+                                    <p className="text-[13px] text-[#6b6b6b]">
                                         {new Date(o.created_at).toLocaleDateString('ru-RU', {
                                             day: 'numeric', month: 'long', year: 'numeric'
                                         })}
                                         {itemCount > 0 && (
-                                            <span className="ml-2 text-[#aeaeb2]">
+                                            <span className="ml-2 text-[#3d3d3d]">
                                                 · {itemCount} {itemCount === 1 ? 'позиция' : itemCount < 5 ? 'позиции' : 'позиций'}
                                             </span>
                                         )}
                                     </p>
                                 </div>
                                 <div className="text-right flex-shrink-0">
-                                    <p className="text-[17px] font-semibold tracking-tight">
+                                    <p className="text-[17px] font-bold tracking-tight text-[#f0ece4]">
                                         {o.total.toLocaleString('ru-RU')} ₸
                                     </p>
-                                    <ChevronRight size={16} className="text-[#aeaeb2] group-hover:text-[#1d1d1f] transition-colors ml-auto mt-1" />
+                                    <ChevronRight size={16} className="text-[#3d3d3d] group-hover:text-[#f0ece4] transition-colors ml-auto mt-1" />
                                 </div>
                             </Link>
                         )

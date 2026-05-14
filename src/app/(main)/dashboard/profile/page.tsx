@@ -22,16 +22,16 @@ export default async function ProfilePage() {
             <div className="flex items-center gap-2 mb-8 fade-in">
                 <Link
                     href="/dashboard"
-                    className="inline-flex items-center gap-1.5 text-[14px] text-[#6e6e73] hover:text-[#1d1d1f] transition-colors"
+                    className="inline-flex items-center gap-1.5 text-[14px] text-[#6b6b6b] hover:text-[#f0ece4] transition-colors"
                 >
                     <ChevronLeft size={16} />
                     Кабинет
                 </Link>
-                <span className="text-[#aeaeb2]">/</span>
-                <span className="text-[14px]">Профиль</span>
+                <span className="text-[#3d3d3d]">/</span>
+                <span className="text-[14px] text-[#f0ece4]">Профиль</span>
             </div>
 
-            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight mb-8 fade-in">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-[-0.04em] mb-8 fade-in text-[#f0ece4]">
                 Мой профиль
             </h1>
 
