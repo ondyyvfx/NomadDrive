@@ -340,31 +340,53 @@ const T = {
     },
 }
 
-/* ─── Data ─── */
-const RENT_CARS = [
-    { brand: 'BMW', model: 'M340i xDrive', img: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=900&q=80', year: 2024, seats: 5, rating: 5.0, trans: 'auto', fuel: 'бензин', price: '28 000', unit: '₸/день' },
-    { brand: 'Mercedes-Benz', model: 'E-Class W214', img: 'https://images.unsplash.com/photo-1617814065893-00757125efab?auto=format&fit=crop&w=900&q=80', year: 2024, seats: 5, rating: 4.9, trans: 'auto', fuel: 'гибрид', price: '34 000', unit: '₸/день' },
-    { brand: 'Porsche', model: 'Macan GTS', img: 'https://images.unsplash.com/photo-1611821064430-0d40291d0f0b?auto=format&fit=crop&w=900&q=80', year: 2023, seats: 5, rating: 5.0, trans: 'auto', fuel: 'бензин', price: '51 000', unit: '₸/день' },
-    { brand: 'Land Rover', model: 'Defender 110', img: 'https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?auto=format&fit=crop&w=900&q=80', year: 2024, seats: 7, rating: 4.9, trans: 'auto', fuel: 'дизель', price: '60 000', unit: '₸/день' },
-    { brand: 'Tesla', model: 'Model Y Long Range', img: 'https://images.unsplash.com/photo-1617704548623-340376564e68?auto=format&fit=crop&w=900&q=80', year: 2024, seats: 5, rating: 4.8, trans: 'auto', fuel: 'электро', price: '30 000', unit: '₸/день' },
-    { brand: 'Audi', model: 'RS6 Avant', img: 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&w=900&q=80', year: 2023, seats: 5, rating: 5.0, trans: 'auto', fuel: 'бензин', price: '69 000', unit: '₸/день' },
-]
+/* ─── Типы данных из Supabase ─── */
+interface RentCarRow {
+    id: string; brand: string; model: string; year: number; seats: number
+    transmission: string | null; fuel_type: string | null
+    price_per_day: number; image_urls: string[] | null
+}
+interface SaleCarRow {
+    id: string; brand: string; model: string; year: number; mileage: number
+    transmission: string | null; fuel_type: string | null
+    price: number; image_urls: string[] | null
+}
+interface PartRow {
+    id: string; name: string; brand: string; category: string | null
+    price: number; oem_number: string | null; image_urls: string[] | null
+}
 
-const BUY_CARS = [
-    { brand: 'BMW', model: 'M2 Coupe', img: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=900&q=80', year: 2023, seats: 4, rating: 4.9, trans: 'механика', fuel: 'бензин', price: '26 400 000', unit: '₸' },
-    { brand: 'Porsche', model: '911 Carrera', img: 'https://images.unsplash.com/photo-1611821064430-0d40291d0f0b?auto=format&fit=crop&w=900&q=80', year: 2022, seats: 4, rating: 5.0, trans: 'auto', fuel: 'бензин', price: '50 000 000', unit: '₸' },
-    { brand: 'Mercedes-Benz', model: 'G 63 AMG', img: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=900&q=80', year: 2024, seats: 5, rating: 4.8, trans: 'auto', fuel: 'бензин', price: '83 000 000', unit: '₸' },
-    { brand: 'Tesla', model: 'Model S Plaid', img: 'https://images.unsplash.com/photo-1617704548623-340376564e68?auto=format&fit=crop&w=900&q=80', year: 2024, seats: 5, rating: 4.9, trans: 'auto', fuel: 'электро', price: '39 700 000', unit: '₸' },
-    { brand: 'Audi', model: 'RS3 Sedan', img: 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&w=900&q=80', year: 2023, seats: 5, rating: 4.9, trans: 'auto', fuel: 'бензин', price: '31 500 000', unit: '₸' },
-    { brand: 'Land Rover', model: 'Range Rover Sport', img: 'https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?auto=format&fit=crop&w=900&q=80', year: 2024, seats: 5, rating: 5.0, trans: 'auto', fuel: 'дизель', price: '60 000 000', unit: '₸' },
-]
+interface LandingData {
+    rentCars: RentCarRow[]
+    saleCars: SaleCarRow[]
+    parts: PartRow[]
+}
 
-const PARTS = [
-    { name: 'Кованые диски 21"', tag: 'OEM · 5×112', img: 'https://images.unsplash.com/photo-1486496146582-9ffcd0b2b2b7?auto=format&fit=crop&w=600&q=80', price: '890 000₸', dark: false },
-    { name: 'Тормозной комплект Brembo', tag: 'Brembo · Передний', img: 'https://images.unsplash.com/photo-1632823469765-c54df2caaa11?auto=format&fit=crop&w=600&q=80', price: '1 620 000₸', dark: true },
-    { name: 'Карбоновые пороги', tag: 'Pre-Preg · M3 fit', img: 'https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&w=600&q=80', price: '525 000₸', dark: false },
-    { name: 'LED Матричные фары', tag: 'Adaptive · Комплект', img: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=600&q=80', price: '1 145 000₸', dark: false },
-]
+const transLabel: Record<string, string> = { auto: 'автомат', manual: 'механика' }
+const fuelLabel: Record<string, string> = { petrol: 'бензин', diesel: 'дизель', electric: 'электро', hybrid: 'гибрид' }
+
+/* Нормализованная карточка авто для витрины */
+interface VehicleView {
+    href: string; brand: string; model: string; img: string | null
+    year: number; seats: number; meta: string; price: string; unit: string
+}
+
+function rentToView(c: RentCarRow): VehicleView {
+    return {
+        href: `/rent/${c.id}`, brand: c.brand, model: c.model, img: c.image_urls?.[0] ?? null,
+        year: c.year, seats: c.seats,
+        meta: [c.transmission && transLabel[c.transmission], c.fuel_type && fuelLabel[c.fuel_type]].filter(Boolean).join(' · '),
+        price: c.price_per_day.toLocaleString('ru-RU'), unit: '₸/день',
+    }
+}
+function saleToView(c: SaleCarRow): VehicleView {
+    return {
+        href: `/sale/${c.id}`, brand: c.brand, model: c.model, img: c.image_urls?.[0] ?? null,
+        year: c.year, seats: 0,
+        meta: [`${(c.mileage / 1000).toFixed(0)}к км`, c.transmission && transLabel[c.transmission]].filter(Boolean).join(' · '),
+        price: c.price.toLocaleString('ru-RU'), unit: '₸',
+    }
+}
 
 /* ─── SVG icons ─── */
 function ArrowIcon({ size = 16 }: { size?: number }) {
@@ -385,13 +407,6 @@ function SeatIcon() {
     return (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={12} height={12}>
             <path d="M16 19v-3M8 19v-3M4 21h16M5 16h14a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2zM7 9V5a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v4" />
-        </svg>
-    )
-}
-function ArrowDownLeftIcon({ size = 14 }: { size?: number }) {
-    return (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width={size} height={size}>
-            <line x1="17" y1="7" x2="7" y2="17" /><polyline points="15 17 7 17 7 9" />
         </svg>
     )
 }
@@ -430,7 +445,8 @@ function SearchBar({ t }: { t: T }) {
                     </span>
                 </div>
             ))}
-            <button
+            <Link
+                href="/rent"
                 className="rounded-[14px] px-6 flex items-center gap-3 font-semibold text-[14px] text-[#0b0b0c] transition-all duration-200 hover:opacity-90"
                 style={{ background: '#f2ede4' }}
             >
@@ -438,7 +454,7 @@ function SearchBar({ t }: { t: T }) {
                 <span className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: '#0b0b0c', color: '#f2ede4' }}>
                     <ArrowIcon />
                 </span>
-            </button>
+            </Link>
         </div>
     )
 }
@@ -474,16 +490,6 @@ function Hero({ t }: { t: T }) {
                 nomaddrive
             </div>
 
-            {/* left social icons */}
-            <div className="absolute left-7 hidden lg:flex flex-col gap-3" style={{ top: '50%', transform: 'translateY(-50%)', zIndex: 3 }}>
-                {['ig', 'yt', 'dc'].map(s => (
-                    <a key={s} href="#"
-                        className="w-[38px] h-[38px] rounded-full flex items-center justify-center text-[#f2ede4] text-[12px] font-bold transition-colors hover:bg-white/20"
-                        style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.18)' }}>
-                        {s.toUpperCase()}
-                    </a>
-                ))}
-            </div>
 
             {/* right stats */}
             <div className="absolute right-7 hidden lg:flex flex-col gap-7 text-right" style={{ top: '38%', zIndex: 3 }}>
@@ -548,33 +554,36 @@ function Ticker({ t }: { t: T }) {
     )
 }
 
-function VehicleCard({ c, mode }: { c: typeof RENT_CARS[0]; mode: string }) {
+function VehicleCard({ v }: { v: VehicleView }) {
     return (
-        <article
+        <Link
+            href={v.href}
             className="rounded-[28px] p-[22px] flex flex-col gap-4 border border-transparent cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:border-[#dbd4c5]"
             style={{ background: '#faf7f1' }}
         >
             <div className="flex flex-col items-center text-center gap-1">
-                <span className="font-bold text-[18px] tracking-[0.04em] uppercase" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#0b0b0c' }}>{c.brand}</span>
-                <span className="font-bold text-[18px] tracking-[0.04em] uppercase" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#0b0b0c' }}>{c.model}</span>
+                <span className="font-bold text-[18px] tracking-[0.04em] uppercase" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#0b0b0c' }}>{v.brand}</span>
+                <span className="font-bold text-[18px] tracking-[0.04em] uppercase" style={{ fontFamily: "'Space Grotesk', sans-serif", color: '#0b0b0c' }}>{v.model}</span>
             </div>
-            <div className="h-[170px] rounded-[18px] overflow-hidden" style={{ background: '#e8e1d3' }}>
-                <img src={c.img} alt={c.brand + ' ' + c.model} loading="lazy" className="w-full h-full object-cover" />
+            <div className="h-[170px] rounded-[18px] overflow-hidden flex items-center justify-center" style={{ background: '#e8e1d3' }}>
+                {v.img
+                    ? <img src={v.img} alt={v.brand + ' ' + v.model} loading="lazy" className="w-full h-full object-cover" />
+                    : <span className="text-[40px]">🚗</span>}
             </div>
             <div className="flex flex-wrap gap-3 pt-1 border-t border-dashed border-[#dbd4c5] text-[11px] tracking-[0.06em]" style={{ fontFamily: "'JetBrains Mono', monospace", color: '#8c8a85' }}>
-                <span className="flex items-center gap-1"><SeatIcon /> {c.seats}</span>
-                <span className="text-[#0b0b0c]">★ {c.rating.toFixed(1)}</span>
-                <span>{c.year} · {c.trans} · {c.fuel}</span>
+                {v.seats > 0 && <span className="flex items-center gap-1"><SeatIcon /> {v.seats}</span>}
+                <span className="text-[#0b0b0c]">{v.year}</span>
+                {v.meta && <span>{v.meta}</span>}
             </div>
             <div className="flex items-center justify-between gap-3">
                 <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 22, color: '#0b0b0c' }}>
-                    {c.price}<small className="text-[13px] font-medium ml-0.5" style={{ color: '#8c8a85', fontFamily: 'inherit' }}>{c.unit}</small>
+                    {v.price}<small className="text-[13px] font-medium ml-0.5" style={{ color: '#8c8a85', fontFamily: 'inherit' }}>{v.unit}</small>
                 </div>
-                <button className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 text-[#f2ede4]" style={{ background: '#0b0b0c' }}>
+                <span className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 text-[#f2ede4]" style={{ background: '#0b0b0c' }}>
                     <ArrowIcon />
-                </button>
+                </span>
             </div>
-        </article>
+        </Link>
     )
 }
 
@@ -589,10 +598,10 @@ function SellPanel({ t }: { t: T }) {
                     <em style={{ fontStyle: 'normal', color: '#c9a96e' }}>{t.sell_title_em}</em>
                 </h3>
                 <p className="text-[15px] leading-[1.55] mb-6 max-w-[380px]" style={{ color: '#8c8a85' }}>{t.sell_sub}</p>
-                <button className="inline-flex items-center gap-3 rounded-full font-semibold text-[15px] px-6 py-[18px] text-[#f2ede4] transition-all duration-200 hover:opacity-90" style={{ background: '#0b0b0c' }}>
+                <Link href="#contact" className="inline-flex items-center gap-3 rounded-full font-semibold text-[15px] px-6 py-[18px] text-[#f2ede4] transition-all duration-200 hover:opacity-90" style={{ background: '#0b0b0c' }}>
                     {t.sell_cta}
                     <span className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: '#c9a96e', color: '#1a0e00' }}><ArrowIcon /></span>
-                </button>
+                </Link>
             </div>
             <div className="flex flex-col gap-2">
                 {t.sell_steps.map((s, i) => {
@@ -627,7 +636,7 @@ function SellPanel({ t }: { t: T }) {
 
 type Mode = 'rent' | 'buy' | 'sell' | 'parts'
 
-function Listings({ t, mode, setMode }: { t: T; mode: Mode; setMode: (m: Mode) => void }) {
+function Listings({ t, mode, setMode, data }: { t: T; mode: Mode; setMode: (m: Mode) => void; data: LandingData }) {
     const modes: { id: Mode; label: string; badge: string }[] = [
         { id: 'rent', label: t.mode_rent, badge: t.mode_badge_rent },
         { id: 'buy', label: t.mode_buy, badge: t.mode_badge_buy },
@@ -637,7 +646,10 @@ function Listings({ t, mode, setMode }: { t: T; mode: Mode; setMode: (m: Mode) =
     const titles = { rent: t.title_rent, buy: t.title_buy, sell: t.title_sell, parts: t.title_parts }
     const subs = { rent: t.sub_rent, buy: t.sub_buy, sell: t.sub_sell, parts: t.sub_parts }
     const btns = { rent: t.btn_rent, buy: t.btn_buy, sell: t.btn_sell, parts: t.btn_parts }
-    const cars = mode === 'buy' ? BUY_CARS : RENT_CARS
+    const btnHref: Record<Mode, string> = { rent: '/rent', buy: '/sale', sell: '#contact', parts: '/parts' }
+    const views: VehicleView[] = mode === 'buy'
+        ? data.saleCars.map(saleToView)
+        : data.rentCars.map(rentToView)
 
     return (
         <section className="py-[110px]" style={{ background: '#f2ede4' }} id="fleet">
@@ -683,40 +695,53 @@ function Listings({ t, mode, setMode }: { t: T; mode: Mode; setMode: (m: Mode) =
                 {/* Content */}
                 {mode === 'parts' ? (
                     <div className="grid gap-[18px]" style={{ gridTemplateColumns: 'repeat(4,1fr)' }}>
-                        {PARTS.map((p, i) => (
-                            <article
-                                key={i}
-                                className="rounded-[28px] p-[22px] flex flex-col gap-[18px] min-h-[280px] transition-all duration-250 hover:-translate-y-1 cursor-pointer"
-                                style={{ background: p.dark ? '#0b0b0c' : '#faf7f1', color: p.dark ? '#f2ede4' : '#0b0b0c' }}
-                            >
-                                <div className="h-[110px] rounded-[12px] overflow-hidden" style={{ background: '#e8e1d3' }}>
-                                    <img src={p.img} alt={p.name} loading="lazy" className="w-full h-full object-cover" />
-                                </div>
-                                <span className="text-[10px] uppercase tracking-[0.14em]" style={{ fontFamily: "'JetBrains Mono', monospace", color: p.dark ? 'rgba(242,237,228,0.55)' : '#8c8a85' }}>{p.tag}</span>
-                                <h4 className="font-bold text-[17px] uppercase tracking-[0.02em]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{p.name}</h4>
-                                <div className="mt-auto flex items-center justify-between">
-                                    <span className="font-bold text-[18px]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{p.price}</span>
-                                    <button className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: p.dark ? '#c9a96e' : '#0b0b0c', color: p.dark ? '#1a0e00' : '#f2ede4' }}>
-                                        <ArrowIcon size={14} />
-                                    </button>
-                                </div>
-                            </article>
-                        ))}
+                        {data.parts.map((p, i) => {
+                            const dark = i % 2 === 1
+                            const tag = [p.category, p.oem_number && `OEM ${p.oem_number}`].filter(Boolean).join(' · ') || p.brand
+                            return (
+                                <Link
+                                    href="/parts"
+                                    key={p.id}
+                                    className="rounded-[28px] p-[22px] flex flex-col gap-[18px] min-h-[280px] transition-all duration-250 hover:-translate-y-1 cursor-pointer"
+                                    style={{ background: dark ? '#0b0b0c' : '#faf7f1', color: dark ? '#f2ede4' : '#0b0b0c' }}
+                                >
+                                    <div className="h-[110px] rounded-[12px] overflow-hidden flex items-center justify-center" style={{ background: '#e8e1d3' }}>
+                                        {p.image_urls?.[0]
+                                            ? <img src={p.image_urls[0]} alt={p.name} loading="lazy" className="w-full h-full object-cover" />
+                                            : <span className="text-[28px]">🔧</span>}
+                                    </div>
+                                    <span className="text-[10px] uppercase tracking-[0.14em]" style={{ fontFamily: "'JetBrains Mono', monospace", color: dark ? 'rgba(242,237,228,0.55)' : '#8c8a85' }}>{tag}</span>
+                                    <h4 className="font-bold text-[17px] uppercase tracking-[0.02em] line-clamp-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{p.name}</h4>
+                                    <div className="mt-auto flex items-center justify-between">
+                                        <span className="font-bold text-[18px]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{p.price.toLocaleString('ru-RU')} ₸</span>
+                                        <span className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: dark ? '#c9a96e' : '#0b0b0c', color: dark ? '#1a0e00' : '#f2ede4' }}>
+                                            <ArrowIcon size={14} />
+                                        </span>
+                                    </div>
+                                </Link>
+                            )
+                        })}
+                        {data.parts.length === 0 && (
+                            <p className="col-span-4 text-center py-12 text-[15px]" style={{ color: '#8c8a85' }}>Каталог запчастей скоро пополнится</p>
+                        )}
                     </div>
                 ) : mode === 'sell' ? (
                     <SellPanel t={t} />
                 ) : (
                     <div className="grid grid-cols-3 gap-[22px]">
-                        {cars.slice(0, 6).map((c, i) => <VehicleCard key={i} c={c} mode={mode} />)}
+                        {views.slice(0, 6).map((v) => <VehicleCard key={v.href} v={v} />)}
+                        {views.length === 0 && (
+                            <p className="col-span-3 text-center py-12 text-[15px]" style={{ color: '#8c8a85' }}>Скоро здесь появятся автомобили</p>
+                        )}
                     </div>
                 )}
 
                 {/* Footer btn */}
                 <div className="flex justify-center mt-14">
-                    <button className="inline-flex items-center gap-3.5 rounded-full font-semibold text-[15px] px-9 py-[18px] text-[#f2ede4] transition-all duration-200 hover:-translate-y-0.5" style={{ fontFamily: "'Space Grotesk', sans-serif", background: '#0b0b0c' }}>
+                    <Link href={btnHref[mode]} className="inline-flex items-center gap-3.5 rounded-full font-semibold text-[15px] px-9 py-[18px] text-[#f2ede4] transition-all duration-200 hover:-translate-y-0.5" style={{ fontFamily: "'Space Grotesk', sans-serif", background: '#0b0b0c' }}>
                         {btns[mode]}
                         <span className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: '#c9a96e', color: '#1a0e00' }}><ArrowIcon size={14} /></span>
-                    </button>
+                    </Link>
                 </div>
             </div>
         </section>
@@ -749,10 +774,10 @@ function Showcase({ t }: { t: T }) {
                         </h2>
                         <p className="text-[16px] leading-[1.55] mb-7 max-w-[480px]" style={{ color: '#8c8a85' }}>{t.showcase_p1}</p>
                         <p className="text-[16px] leading-[1.55] mb-7 max-w-[480px]" style={{ color: '#8c8a85' }}>{t.showcase_p2}</p>
-                        <button className="inline-flex items-center gap-3 rounded-full font-semibold text-[15px] px-6 py-[18px] text-[#f2ede4] transition-all duration-200 hover:opacity-90" style={{ fontFamily: "'Space Grotesk',sans-serif", background: '#0b0b0c' }}>
+                        <Link href="#how" className="inline-flex items-center gap-3 rounded-full font-semibold text-[15px] px-6 py-[18px] text-[#f2ede4] transition-all duration-200 hover:opacity-90" style={{ fontFamily: "'Space Grotesk',sans-serif", background: '#0b0b0c' }}>
                             {t.showcase_btn}
                             <span className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: '#c9a96e', color: '#1a0e00' }}><ArrowIcon size={14} /></span>
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -764,8 +789,8 @@ function Why({ t }: { t: T }) {
     const cards = [
         { dark: true, title: t.why_1_title, body: t.why_1_body, corner: true },
         { light: true, title: t.why_2_title, body: t.why_2_body, corner: true },
-        { dark: true, title: t.why_3_title, body: t.why_3_body, wheel: true },
-        { light: true, title: t.why_4_title, body: t.why_4_body, steering: true },
+        { dark: true, title: t.why_3_title, body: t.why_3_body, corner: true },
+        { light: true, title: t.why_4_title, body: t.why_4_body, corner: true },
         { feature: true, title: t.why_5_title, body: t.why_5_body },
         { light: true, title: t.why_6_title, body: t.why_6_body, corner: true },
     ]
@@ -807,12 +832,6 @@ function Why({ t }: { t: T }) {
                                     <span className="self-end w-11 h-11 rounded-full flex items-center justify-center mt-4" style={{ background: isLight ? '#0b0b0c' : 'rgba(255,255,255,0.06)', border: isLight ? 'none' : '1px solid rgba(255,255,255,0.12)', color: '#f2ede4' }}>
                                         <ArrowIcon />
                                     </span>
-                                )}
-                                {c.wheel && (
-                                    <div className="absolute rounded-full opacity-95" style={{ right: -40, bottom: -50, width: 180, height: 180, backgroundImage: `url(https://images.unsplash.com/photo-1486496146582-9ffcd0b2b2b7?auto=format&fit=crop&w=600&q=80)`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-                                )}
-                                {c.steering && (
-                                    <div className="absolute rounded-full" style={{ right: -30, bottom: -40, width: 170, height: 170, backgroundImage: `url(https://images.unsplash.com/photo-1581540222194-0def2dda95b8?auto=format&fit=crop&w=600&q=80)`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
                                 )}
                                 {c.feature && (
                                     <span className="font-bold text-[32px] tracking-[-0.02em] mt-4" style={{ fontFamily: "'Space Grotesk',sans-serif", background: 'linear-gradient(90deg,#fff,#c7b9ff)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>
@@ -945,8 +964,8 @@ function Testimonials({ t }: { t: T }) {
                                 }}
                             >
                                 <div className="flex items-center gap-3.5">
-                                    <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0" style={{ background: '#e8e1d3' }}>
-                                        <img src={card.avatar} alt={card.name} className="w-full h-full object-cover" />
+                                    <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center font-bold text-[20px]" style={{ background: isFeat ? '#c9a96e' : '#0b0b0c', color: isFeat ? '#1a0e00' : '#f2ede4', fontFamily: "'Space Grotesk',sans-serif" }}>
+                                        {card.name.charAt(0)}
                                     </div>
                                     <div>
                                         <div className="font-bold text-[17px] uppercase tracking-[0.04em]" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>{card.name}</div>
@@ -1038,21 +1057,14 @@ function CTA({ t }: { t: T }) {
                             {t.cta_title_1}<br /><em style={{ fontStyle: 'normal', color: '#c9a96e' }}>{t.cta_title_em}</em><br />{t.cta_title_2}
                         </h2>
                         <p className="text-[16px] leading-[1.55] mb-9 max-w-[380px]" style={{ color: 'rgba(242,237,228,0.65)' }}>{t.cta_sub}</p>
-                        <div className="flex gap-2.5">
-                            {[
-                                { href: '#', label: 'DC' },
-                                { href: '#', label: 'YT' },
-                                { href: '#', label: 'IG' },
-                            ].map(s => (
-                                <a
-                                    key={s.label}
-                                    href={s.href}
-                                    className="w-11 h-11 rounded-full flex items-center justify-center text-[11px] font-bold tracking-[0.05em] transition-all duration-200 hover:bg-[#c9a96e] hover:text-[#1a0e00]"
-                                    style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: '#f2ede4' }}
-                                >
-                                    {s.label}
-                                </a>
-                            ))}
+                        <div className="flex flex-col gap-2.5">
+                            <a href="tel:+77007007000" className="inline-flex items-center gap-2 text-[15px] font-semibold transition-colors hover:text-[#c9a96e]" style={{ color: '#f2ede4' }}>
+                                +7 700 700 70 00
+                            </a>
+                            <a href="mailto:info@nomaddrive.kz" className="inline-flex items-center gap-2 text-[15px] transition-colors hover:text-[#c9a96e]" style={{ color: 'rgba(242,237,228,0.65)' }}>
+                                info@nomaddrive.kz
+                            </a>
+                            <span className="text-[14px]" style={{ color: 'rgba(242,237,228,0.45)' }}>Алматы, проспект Аль-Фараби</span>
                         </div>
                     </div>
                     <form className="flex flex-col gap-3" onSubmit={submit}>
@@ -1126,7 +1138,7 @@ function LandingFooterBanner({ t }: { t: T }) {
 }
 
 /* ─── Main export ─── */
-export function LandingPage() {
+export function LandingPage({ rentCars, saleCars, parts }: LandingData) {
     const { lang } = useLanguage()
     const t = T[lang]
     const [mode, setMode] = useState<Mode>('rent')
@@ -1135,7 +1147,7 @@ export function LandingPage() {
         <div className="-mt-[56px] overflow-x-hidden">
             <Hero t={t} />
             <Ticker t={t} />
-            <Listings t={t} mode={mode} setMode={setMode} />
+            <Listings t={t} mode={mode} setMode={setMode} data={{ rentCars, saleCars, parts }} />
             <Showcase t={t} />
             <Why t={t} />
             <Steps t={t} />

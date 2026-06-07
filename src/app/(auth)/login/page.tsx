@@ -29,7 +29,8 @@ export default function LoginPage() {
             const supabase = createClient()
             const { error } = await supabase.auth.signInWithPassword({ email, password })
             if (error) throw error
-            router.push('/')
+            const redirect = new URLSearchParams(window.location.search).get('redirect')
+            router.push(redirect && redirect.startsWith('/') ? redirect : '/')
             router.refresh()
         } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : 'Ошибка входа'
@@ -89,7 +90,7 @@ export default function LoginPage() {
 
                 {/* Нижний текст */}
                 <p className="relative z-10 text-[#3d3d3d] text-[13px]">
-                    © 2025 NomadDrive · Алматы
+                    © 2026 NomadDrive · Алматы
                 </p>
             </div>
 

@@ -37,10 +37,10 @@ export function Footer() {
 
                 <div className="mt-10 pt-6 border-t border-white/[0.06] flex flex-col md:flex-row items-center justify-between gap-2">
                     <p className="text-[14px] text-[#3d3d3d]">
-                        © 2025 NomadDrive
+                        © 2026 NomadDrive
                     </p>
                     <p className="text-[14px] text-[#3d3d3d]">
-                        Алматы, Казахстан
+                        Алматы, Казахстан · +7 700 700 70 00
                     </p>
                 </div>
 

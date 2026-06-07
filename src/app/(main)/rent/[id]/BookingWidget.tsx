@@ -74,7 +74,7 @@ export function BookingWidget({ car, user }: Props) {
 
     async function handleBooking() {
         if (!user) {
-            router.push(`/login?redirect=/cars/${car.id}`)
+            router.push(`/login?redirect=/rent/${car.id}`)
             return
         }
 

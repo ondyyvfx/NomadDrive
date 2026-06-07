@@ -199,24 +199,36 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
                                 ))}
                             </div>
 
-                            <button
-                                className={`w-full h-12 font-bold rounded-[12px] transition-all duration-300 flex items-center justify-center gap-2 text-[15px] ${car.status === 'available'
-                                        ? 'bg-[#c9a96e] text-[#0a0a0a] hover:bg-[#d4b87a]'
-                                        : 'bg-[#1a1a1a] text-[#3d3d3d] cursor-not-allowed border border-white/[0.06]'
-                                    }`}
-                                disabled={car.status !== 'available'}
-                            >
-                                <Phone size={16} />
-                                {car.status === 'available' ? 'Связаться с продавцом' : status.label}
-                            </button>
+                            {car.status === 'available' ? (
+                                <a
+                                    href="tel:+77007007000"
+                                    className="w-full h-12 font-bold rounded-[12px] transition-all duration-300 flex items-center justify-center gap-2 text-[15px] bg-[#c9a96e] text-[#0a0a0a] hover:bg-[#d4b87a]"
+                                >
+                                    <Phone size={16} />
+                                    Связаться с продавцом
+                                </a>
+                            ) : (
+                                <button
+                                    className="w-full h-12 font-bold rounded-[12px] flex items-center justify-center gap-2 text-[15px] bg-[#1a1a1a] text-[#3d3d3d] cursor-not-allowed border border-white/[0.06]"
+                                    disabled
+                                >
+                                    <Phone size={16} />
+                                    {status.label}
+                                </button>
+                            )}
 
-                            <button className="w-full h-12 bg-[#1a1a1a] text-[#f0ece4] font-medium rounded-[12px] border border-white/[0.08] hover:bg-white/[0.04] transition-colors text-[15px] flex items-center justify-center gap-2">
+                            <a
+                                href={`https://wa.me/77007007000?text=${encodeURIComponent(`Здравствуйте! Интересует ${car.brand} ${car.model} ${car.year} за ${car.price.toLocaleString('ru-RU')} ₸`)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full h-12 bg-[#1a1a1a] text-[#f0ece4] font-medium rounded-[12px] border border-white/[0.08] hover:bg-white/[0.04] transition-colors text-[15px] flex items-center justify-center gap-2"
+                            >
                                 <MessageCircle size={16} />
-                                Написать в чат
-                            </button>
+                                Написать в WhatsApp
+                            </a>
 
                             <p className="text-[12px] text-[#3d3d3d] text-center">
-                                Безопасная сделка через платформу NomadDrive
+                                Безопасная сделка через платформу NomadDrive · +7 700 700 70 00
                             </p>
                         </div>
                     </div>

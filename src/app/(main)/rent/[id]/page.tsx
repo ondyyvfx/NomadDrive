@@ -251,7 +251,7 @@ export default async function CarPage({
                         {similar.map(s => (
                             <Link
                                 key={s.id}
-                                href={`/cars/${s.id}`}
+                                href={`/rent/${s.id}`}
                                 className="group bg-[#111111] border border-white/[0.07] rounded-[14px] overflow-hidden hover:shadow-lg hover:-translate-y-1 hover:border-white/[0.12] transition-all duration-300"
                             >
                                 <div className="relative h-40 bg-[#161616]">

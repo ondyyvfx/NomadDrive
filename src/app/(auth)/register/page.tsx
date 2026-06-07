@@ -129,7 +129,7 @@ export default function RegisterPage() {
                 </div>
 
                 <p className="relative z-10 text-[#3d3d3d] text-[13px]">
-                    © 2025 NomadDrive · Алматы
+                    © 2026 NomadDrive · Алматы
                 </p>
             </div>
 
