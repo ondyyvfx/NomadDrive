@@ -1,12 +1,17 @@
 import { createClient } from '@/lib/supabase/server'
+import { getServerDict } from '@/lib/i18n.server'
 import Link from 'next/link'
 import { Package } from 'lucide-react'
 import { AdminStatusBadge } from '../AdminStatusBadge'
 
-export const metadata = { title: 'Admin — Заказы' }
+export async function generateMetadata() {
+    const { admin: t } = await getServerDict()
+    return { title: `Admin — ${t.ordersTitle}` }
+}
 
 export default async function AdminOrdersPage() {
     const supabase = await createClient()
+    const { admin: t, common } = await getServerDict()
 
     const { data: orders } = await supabase
         .from('orders')
@@ -16,8 +21,8 @@ export default async function AdminOrdersPage() {
     return (
         <div className="max-w-[1000px]">
             <div className="mb-8 fade-in">
-                <h1 className="text-2xl font-bold tracking-[-0.04em] text-[#f0ece4]">Заказы</h1>
-                <p className="text-[14px] text-[#6b6b6b] mt-1">Всего: {orders?.length ?? 0}</p>
+                <h1 className="text-2xl font-bold tracking-[-0.04em] text-[#f0ece4]">{t.ordersTitle}</h1>
+                <p className="text-[14px] text-[#6b6b6b] mt-1">{t.total} {orders?.length ?? 0}</p>
             </div>
 
             <div className="bg-[#111111] border border-white/[0.07] rounded-[16px] overflow-hidden fade-in">
@@ -26,7 +31,7 @@ export default async function AdminOrdersPage() {
                     <table className="w-full">
                         <thead>
                             <tr className="border-b border-white/[0.06]">
-                                {['ID', 'Клиент', 'Тип', 'Позиций', 'Сумма', 'Статус', 'Оплата'].map(h => (
+                                {[t.thId, t.thClient, t.thType, t.thItems, t.thSum, t.thStatus, t.thPayment].map(h => (
                                     <th key={h} className="text-left px-5 py-3.5 text-[12px] font-semibold text-[#6b6b6b] uppercase tracking-wide">
                                         {h}
                                     </th>
@@ -53,14 +58,14 @@ export default async function AdminOrdersPage() {
                                         </td>
                                         <td className="px-5 py-3.5">
                                             <span className="text-[12px] px-2.5 py-1 bg-white/[0.05] rounded-full text-[#6b6b6b]">
-                                                {o.type === 'parts' ? 'Запчасти' : 'Авто'}
+                                                {o.type === 'parts' ? t.typeParts : t.typeCar}
                                             </span>
                                         </td>
                                         <td className="px-5 py-3.5 text-[13px] text-[#6b6b6b]">
-                                            {itemCount} шт.
+                                            {itemCount} {t.pcs}
                                         </td>
                                         <td className="px-5 py-3.5 text-[13px] font-semibold text-[#f0ece4]">
-                                            {o.total.toLocaleString('ru-RU')} ₸
+                                            {o.total.toLocaleString(common.locale)} ₸
                                         </td>
                                         <td className="px-5 py-3.5">
                                             <AdminStatusBadge status={o.status} />
@@ -68,7 +73,7 @@ export default async function AdminOrdersPage() {
                                         <td className="px-5 py-3.5">
                                             <span className={`text-[12px] font-medium ${o.payment_status === 'paid' ? 'text-[#34c759]' : 'text-[#ff9f0a]'
                                                 }`}>
-                                                {o.payment_status === 'paid' ? 'Оплачен' : 'Ожидает'}
+                                                {o.payment_status === 'paid' ? t.payPaid : t.payPending}
                                             </span>
                                         </td>
                                     </tr>
@@ -102,7 +107,7 @@ export default async function AdminOrdersPage() {
                                 <div className="text-right">
                                     <AdminStatusBadge status={o.status} />
                                     <p className="text-[13px] font-semibold text-[#f0ece4] mt-1">
-                                        {o.total.toLocaleString('ru-RU')} ₸
+                                        {o.total.toLocaleString(common.locale)} ₸
                                     </p>
                                 </div>
                             </Link>
@@ -111,7 +116,7 @@ export default async function AdminOrdersPage() {
                 </div>
 
                 {!orders?.length && (
-                    <p className="text-center py-16 text-[14px] text-[#3d3d3d]">Нет заказов</p>
+                    <p className="text-center py-16 text-[14px] text-[#3d3d3d]">{t.noOrders}</p>
                 )}
             </div>
         </div>

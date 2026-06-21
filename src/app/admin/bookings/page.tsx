@@ -1,12 +1,17 @@
 import { createClient } from '@/lib/supabase/server'
+import { getServerDict } from '@/lib/i18n.server'
 import Link from 'next/link'
 import { Calendar } from 'lucide-react'
 import { AdminStatusBadge } from '../AdminStatusBadge'
 
-export const metadata = { title: 'Admin — Брони' }
+export async function generateMetadata() {
+    const { admin: t } = await getServerDict()
+    return { title: `Admin — ${t.navBookings}` }
+}
 
 export default async function AdminBookingsPage() {
     const supabase = await createClient()
+    const { admin: t, common } = await getServerDict()
 
     const { data: bookings } = await supabase
         .from('bookings')
@@ -16,9 +21,9 @@ export default async function AdminBookingsPage() {
     return (
         <div className="max-w-[1000px]">
             <div className="mb-8 fade-in">
-                <h1 className="text-2xl font-bold tracking-[-0.04em] text-[#f0ece4]">Бронирования</h1>
+                <h1 className="text-2xl font-bold tracking-[-0.04em] text-[#f0ece4]">{t.bookingsTitle}</h1>
                 <p className="text-[14px] text-[#6b6b6b] mt-1">
-                    Всего: {bookings?.length ?? 0}
+                    {t.total} {bookings?.length ?? 0}
                 </p>
             </div>
 
@@ -28,7 +33,7 @@ export default async function AdminBookingsPage() {
                     <table className="w-full">
                         <thead>
                             <tr className="border-b border-white/[0.06]">
-                                {['ID', 'Клиент', 'Автомобиль', 'Даты', 'Сумма', 'Статус'].map(h => (
+                                {[t.thId, t.thClient, t.thCar, t.thDates, t.thSum, t.thStatus].map(h => (
                                     <th key={h} className="text-left px-5 py-3.5 text-[12px] font-semibold text-[#6b6b6b] uppercase tracking-wide">
                                         {h}
                                     </th>
@@ -61,7 +66,7 @@ export default async function AdminBookingsPage() {
                                             <p className="text-[12px] text-[#6b6b6b]">{b.end_date}</p>
                                         </td>
                                         <td className="px-5 py-3.5 text-[13px] font-semibold text-[#f0ece4]">
-                                            {b.total_price.toLocaleString('ru-RU')} ₸
+                                            {b.total_price.toLocaleString(common.locale)} ₸
                                         </td>
                                         <td className="px-5 py-3.5">
                                             <AdminStatusBadge status={b.status} />
@@ -100,7 +105,7 @@ export default async function AdminBookingsPage() {
                                 <div className="text-right">
                                     <AdminStatusBadge status={b.status} />
                                     <p className="text-[13px] font-semibold text-[#f0ece4] mt-1">
-                                        {b.total_price.toLocaleString('ru-RU')} ₸
+                                        {b.total_price.toLocaleString(common.locale)} ₸
                                     </p>
                                 </div>
                             </Link>
@@ -109,7 +114,7 @@ export default async function AdminBookingsPage() {
                 </div>
 
                 {!bookings?.length && (
-                    <p className="text-center py-16 text-[14px] text-[#3d3d3d]">Нет бронирований</p>
+                    <p className="text-center py-16 text-[14px] text-[#3d3d3d]">{t.noBookings}</p>
                 )}
             </div>
         </div>

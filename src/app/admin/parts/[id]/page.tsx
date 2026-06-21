@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getServerDict } from '@/lib/i18n.server'
 import { AdminPartForm } from './AdminPartForm'
 
 export default async function AdminPartEditPage({
@@ -9,6 +10,7 @@ export default async function AdminPartEditPage({
 }) {
     const { id } = await params
     const supabase = await createClient()
+    const { admin: t } = await getServerDict()
 
     const isNew = id === 'new'
     const part = isNew ? null : await supabase
@@ -23,7 +25,7 @@ export default async function AdminPartEditPage({
     return (
         <div className="max-w-[700px]">
             <h1 className="text-2xl font-semibold tracking-tight mb-8 fade-in">
-                {isNew ? 'Новая запчасть' : part?.name}
+                {isNew ? t.newPart : part?.name}
             </h1>
             <AdminPartForm part={part} />
         </div>

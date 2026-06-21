@@ -2,17 +2,8 @@ import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
+import { getServerDict } from '@/lib/i18n.server'
 import { ChevronLeft, Package, Clock, CheckCircle2, XCircle, ShoppingBag } from 'lucide-react'
-
-const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode; step: number }> = {
-    pending: { label: 'В обработке', color: 'text-[#ff9f0a] bg-[#ff9f0a]/[0.08]', icon: <Clock size={14} />, step: 1 },
-    confirmed: { label: 'Подтверждён', color: 'text-[#34c759] bg-[#34c759]/[0.08]', icon: <CheckCircle2 size={14} />, step: 2 },
-    shipped: { label: 'В доставке', color: 'text-[#c9a96e] bg-[#c9a96e]/[0.08]', icon: <CheckCircle2 size={14} />, step: 3 },
-    delivered: { label: 'Доставлен', color: 'text-[#34c759] bg-[#34c759]/[0.08]', icon: <CheckCircle2 size={14} />, step: 4 },
-    cancelled: { label: 'Отменён', color: 'text-[#ff3b30] bg-[#ff3b30]/[0.08]', icon: <XCircle size={14} />, step: 0 },
-}
-
-const steps = ['В обработке', 'Подтверждён', 'В доставке', 'Доставлен']
 
 export default async function OrderDetailPage({
     params,
@@ -21,6 +12,18 @@ export default async function OrderDetailPage({
 }) {
     const { id } = await params
     const supabase = await createClient()
+    const { dash: t, common } = await getServerDict()
+
+    const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode; step: number }> = {
+        pending: { label: t.stProcessing, color: 'text-[#ff9f0a] bg-[#ff9f0a]/[0.08]', icon: <Clock size={14} />, step: 1 },
+        confirmed: { label: t.stConfirmedM, color: 'text-[#34c759] bg-[#34c759]/[0.08]', icon: <CheckCircle2 size={14} />, step: 2 },
+        shipped: { label: t.stShipped, color: 'text-[#c9a96e] bg-[#c9a96e]/[0.08]', icon: <CheckCircle2 size={14} />, step: 3 },
+        delivered: { label: t.stDelivered, color: 'text-[#34c759] bg-[#34c759]/[0.08]', icon: <CheckCircle2 size={14} />, step: 4 },
+        cancelled: { label: t.stCancelledM, color: 'text-[#ff3b30] bg-[#ff3b30]/[0.08]', icon: <XCircle size={14} />, step: 0 },
+    }
+
+    const steps = [t.stProcessing, t.stConfirmedM, t.stShipped, t.stDelivered]
+
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login')
 
@@ -54,7 +57,7 @@ export default async function OrderDetailPage({
                     className="inline-flex items-center gap-1.5 text-[14px] text-[#6b6b6b] hover:text-[#f0ece4] transition-colors"
                 >
                     <ChevronLeft size={16} />
-                    Заказы
+                    {t.orders}
                 </Link>
                 <span className="text-[#3d3d3d]">/</span>
                 <span className="text-[14px] text-[#f0ece4]">#{order.id.slice(0, 8).toUpperCase()}</span>
@@ -65,7 +68,7 @@ export default async function OrderDetailPage({
                 <div className="bg-[#111111] border border-white/[0.07] rounded-[16px] p-6 fade-in">
                     <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
                         <div>
-                            <p className="text-[13px] text-[#6b6b6b] mb-1">Номер заказа</p>
+                            <p className="text-[13px] text-[#6b6b6b] mb-1">{t.orderNumber}</p>
                             <p className="text-[20px] font-bold tracking-tight text-[#f0ece4]">
                                 #{order.id.slice(0, 8).toUpperCase()}
                             </p>
@@ -108,7 +111,7 @@ export default async function OrderDetailPage({
                 <div className="bg-[#111111] border border-white/[0.07] rounded-[16px] p-6 fade-in-up">
                     <h2 className="text-[15px] font-bold tracking-tight mb-4 flex items-center gap-2 text-[#f0ece4]">
                         <ShoppingBag size={16} className="text-[#c9a96e]" />
-                        Состав заказа
+                        {t.orderItems}
                     </h2>
                     <div className="flex flex-col gap-3">
                         {items?.map(item => {
@@ -131,14 +134,14 @@ export default async function OrderDetailPage({
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-[14px] font-semibold truncate text-[#f0ece4]">
-                                            {part?.name ?? 'Запчасть'}
+                                            {part?.name ?? t.partFallback}
                                         </p>
                                         <p className="text-[12px] text-[#6b6b6b]">
-                                            {part?.brand} · {item.quantity} шт.
+                                            {part?.brand} · {item.quantity} {t.pcs}
                                         </p>
                                     </div>
                                     <p className="text-[14px] font-semibold flex-shrink-0 text-[#f0ece4]">
-                                        {(item.price * item.quantity).toLocaleString('ru-RU')} ₸
+                                        {(item.price * item.quantity).toLocaleString(common.locale)} ₸
                                     </p>
                                 </div>
                             )
@@ -147,21 +150,21 @@ export default async function OrderDetailPage({
                 </div>
 
                 <div className="bg-[#111111] border border-white/[0.07] rounded-[16px] p-6 fade-in-up">
-                    <h2 className="text-[15px] font-bold tracking-tight mb-4 text-[#f0ece4]">Оплата</h2>
+                    <h2 className="text-[15px] font-bold tracking-tight mb-4 text-[#f0ece4]">{t.payment}</h2>
                     <div className="flex flex-col gap-2.5">
                         <div className="flex justify-between text-[14px]">
-                            <span className="text-[#6b6b6b]">Статус оплаты</span>
+                            <span className="text-[#6b6b6b]">{t.paymentStatus}</span>
                             <span className={`font-medium ${order.payment_status === 'paid' ? 'text-[#34c759]' : 'text-[#ff9f0a]'
                                 }`}>
-                                {order.payment_status === 'paid' ? 'Оплачено' :
-                                    order.payment_status === 'refunded' ? 'Возвращено' : 'Ожидает оплаты'}
+                                {order.payment_status === 'paid' ? t.paid :
+                                    order.payment_status === 'refunded' ? t.refunded : t.unpaid}
                             </span>
                         </div>
                         <div className="h-px bg-white/[0.06] my-1" />
                         <div className="flex justify-between">
-                            <span className="text-[16px] font-bold text-[#f0ece4]">Итого</span>
+                            <span className="text-[16px] font-bold text-[#f0ece4]">{t.total}</span>
                             <span className="text-[16px] font-bold text-[#c9a96e]">
-                                {order.total.toLocaleString('ru-RU')} ₸
+                                {order.total.toLocaleString(common.locale)} ₸
                             </span>
                         </div>
                     </div>

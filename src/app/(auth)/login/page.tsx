@@ -5,15 +5,16 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, ArrowLeft, Car, Shield, Zap } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-
-const perks = [
-    { icon: Car, text: 'Более 500 автомобилей для аренды и покупки' },
-    { icon: Shield, text: 'Безопасные сделки и защищённая оплата' },
-    { icon: Zap, text: 'Бронирование за 2 минуты онлайн' },
-]
+import { useDict } from '@/contexts/LanguageContext'
 
 export default function LoginPage() {
     const router = useRouter()
+    const { auth: t } = useDict()
+    const perks = [
+        { icon: Car, text: t.loginPerk1 },
+        { icon: Shield, text: t.loginPerk2 },
+        { icon: Zap, text: t.loginPerk3 },
+    ]
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPass, setShowPass] = useState(false)
@@ -33,9 +34,9 @@ export default function LoginPage() {
             router.push(redirect && redirect.startsWith('/') ? redirect : '/')
             router.refresh()
         } catch (err: unknown) {
-            const msg = err instanceof Error ? err.message : 'Ошибка входа'
+            const msg = err instanceof Error ? err.message : t.loginErr
             if (msg.includes('Invalid login credentials')) {
-                setError('Неверный email или пароль')
+                setError(t.loginErrInvalid)
             } else {
                 setError(msg)
             }
@@ -70,10 +71,10 @@ export default function LoginPage() {
                 {/* Центральный контент */}
                 <div className="relative z-10">
                     <h2 className="text-[#f0ece4] text-4xl font-bold tracking-[-0.04em] mb-3 leading-tight">
-                        Добро<br />пожаловать
+                        {t.welcomeTitle}
                     </h2>
                     <p className="text-[#6b6b6b] text-[16px] mb-10 leading-relaxed font-light">
-                        Войдите чтобы управлять бронированиями,<br />заказами и профилем
+                        {t.welcomeSub}
                     </p>
 
                     <div className="flex flex-col gap-4">
@@ -90,7 +91,7 @@ export default function LoginPage() {
 
                 {/* Нижний текст */}
                 <p className="relative z-10 text-[#3d3d3d] text-[13px]">
-                    © 2026 NomadDrive · Алматы
+                    {t.copyright}
                 </p>
             </div>
 
@@ -103,7 +104,7 @@ export default function LoginPage() {
                     className="md:hidden inline-flex items-center gap-1.5 text-[14px] text-[#6b6b6b] hover:text-[#f0ece4] mb-10 transition-colors w-fit"
                 >
                     <ArrowLeft size={16} />
-                    На главную
+                    {t.toHome}
                 </Link>
 
                 <div className="w-full max-w-[380px] mx-auto">
@@ -111,12 +112,12 @@ export default function LoginPage() {
                     {/* Заголовок */}
                     <div className="mb-8">
                         <h1 className="text-[28px] font-bold tracking-[-0.04em] mb-2 text-[#f0ece4]">
-                            Вход в аккаунт
+                            {t.loginTitle}
                         </h1>
                         <p className="text-[#6b6b6b] text-[15px]">
-                            Нет аккаунта?{' '}
+                            {t.noAccount}{' '}
                             <Link href="/register" className="text-[#c9a96e] hover:underline font-medium">
-                                Зарегистрироваться
+                                {t.signUp}
                             </Link>
                         </p>
                     </div>
@@ -127,7 +128,7 @@ export default function LoginPage() {
                         {/* Email */}
                         <div className="flex flex-col gap-1.5">
                             <label className="text-[13px] font-medium text-[#6b6b6b]">
-                                Email
+                                {t.email}
                             </label>
                             <input
                                 type="email"
@@ -144,13 +145,13 @@ export default function LoginPage() {
                         <div className="flex flex-col gap-1.5">
                             <div className="flex items-center justify-between">
                                 <label className="text-[13px] font-medium text-[#6b6b6b]">
-                                    Пароль
+                                    {t.password}
                                 </label>
                                 <Link
                                     href="/forgot-password"
                                     className="text-[13px] text-[#c9a96e] hover:underline"
                                 >
-                                    Забыли пароль?
+                                    {t.forgotPassword}
                                 </Link>
                             </div>
                             <div className="relative">
@@ -189,7 +190,7 @@ export default function LoginPage() {
                             {loading && (
                                 <span className="w-4 h-4 border-2 border-[#0a0a0a]/30 border-t-[#0a0a0a] rounded-full animate-spin" />
                             )}
-                            {loading ? 'Вход...' : 'Войти'}
+                            {loading ? t.loggingIn : t.login}
                         </button>
 
                     </form>
@@ -200,7 +201,7 @@ export default function LoginPage() {
                         className="hidden md:inline-flex items-center gap-1.5 text-[13px] text-[#3d3d3d] hover:text-[#6b6b6b] mt-8 transition-colors"
                     >
                         <ArrowLeft size={14} />
-                        На главную
+                        {t.toHome}
                     </Link>
 
                 </div>

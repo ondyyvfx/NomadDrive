@@ -31,6 +31,16 @@ const T = {
         search_price_4: 'от 80 000 ₸',
         search_cta: 'Найти авто',
         search_reset: 'Сбросить',
+        card_locale: 'ru-RU',
+        card_trans_auto: 'автомат',
+        card_trans_manual: 'механика',
+        card_fuel_petrol: 'бензин',
+        card_fuel_diesel: 'дизель',
+        card_fuel_electric: 'электро',
+        card_fuel_hybrid: 'гибрид',
+        card_km: 'к км',
+        card_unit_rent: '₸/день',
+        card_unit_sale: '₸',
         stat_1_n: '8 400+',
         stat_1_l: 'Водителей в месяц',
         stat_2_n: '14 городов',
@@ -206,6 +216,16 @@ const T = {
         search_price_4: '80 000 ₸ бастап',
         search_cta: 'Автокөлік тап',
         search_reset: 'Тазалау',
+        card_locale: 'kk-KZ',
+        card_trans_auto: 'автомат',
+        card_trans_manual: 'механика',
+        card_fuel_petrol: 'бензин',
+        card_fuel_diesel: 'дизель',
+        card_fuel_electric: 'электро',
+        card_fuel_hybrid: 'гибрид',
+        card_km: 'мың км',
+        card_unit_rent: '₸/күн',
+        card_unit_sale: '₸',
         stat_1_n: '8 400+',
         stat_1_l: 'Айына жүргізуші',
         stat_2_n: '14 қала',
@@ -387,29 +407,29 @@ interface LandingData {
     searchMeta: SearchMeta
 }
 
-const transLabel: Record<string, string> = { auto: 'автомат', manual: 'механика' }
-const fuelLabel: Record<string, string> = { petrol: 'бензин', diesel: 'дизель', electric: 'электро', hybrid: 'гибрид' }
-
 /* Нормализованная карточка авто для витрины */
 interface VehicleView {
     href: string; brand: string; model: string; img: string | null
     year: number; seats: number; meta: string; price: string; unit: string
 }
 
-function rentToView(c: RentCarRow): VehicleView {
+function rentToView(c: RentCarRow, t: T): VehicleView {
+    const transLabel: Record<string, string> = { auto: t.card_trans_auto, manual: t.card_trans_manual }
+    const fuelLabel: Record<string, string> = { petrol: t.card_fuel_petrol, diesel: t.card_fuel_diesel, electric: t.card_fuel_electric, hybrid: t.card_fuel_hybrid }
     return {
         href: `/rent/${c.id}`, brand: c.brand, model: c.model, img: c.image_urls?.[0] ?? null,
         year: c.year, seats: c.seats,
         meta: [c.transmission && transLabel[c.transmission], c.fuel_type && fuelLabel[c.fuel_type]].filter(Boolean).join(' · '),
-        price: c.price_per_day.toLocaleString('ru-RU'), unit: '₸/день',
+        price: c.price_per_day.toLocaleString(t.card_locale), unit: t.card_unit_rent,
     }
 }
-function saleToView(c: SaleCarRow): VehicleView {
+function saleToView(c: SaleCarRow, t: T): VehicleView {
+    const transLabel: Record<string, string> = { auto: t.card_trans_auto, manual: t.card_trans_manual }
     return {
         href: `/sale/${c.id}`, brand: c.brand, model: c.model, img: c.image_urls?.[0] ?? null,
         year: c.year, seats: 0,
-        meta: [`${(c.mileage / 1000).toFixed(0)}к км`, c.transmission && transLabel[c.transmission]].filter(Boolean).join(' · '),
-        price: c.price.toLocaleString('ru-RU'), unit: '₸',
+        meta: [`${(c.mileage / 1000).toFixed(0)}${t.card_km}`, c.transmission && transLabel[c.transmission]].filter(Boolean).join(' · '),
+        price: c.price.toLocaleString(t.card_locale), unit: t.card_unit_sale,
     }
 }
 
@@ -801,8 +821,8 @@ function Listings({ t, mode, setMode, data }: { t: T; mode: Mode; setMode: (m: M
     const btns = { rent: t.btn_rent, buy: t.btn_buy, sell: t.btn_sell, parts: t.btn_parts }
     const btnHref: Record<Mode, string> = { rent: '/rent', buy: '/sale', sell: '#contact', parts: '/parts' }
     const views: VehicleView[] = mode === 'buy'
-        ? data.saleCars.map(saleToView)
-        : data.rentCars.map(rentToView)
+        ? data.saleCars.map(c => saleToView(c, t))
+        : data.rentCars.map(c => rentToView(c, t))
 
     return (
         <section className="py-[110px]" style={{ background: '#f2ede4' }} id="fleet">
@@ -866,7 +886,7 @@ function Listings({ t, mode, setMode, data }: { t: T; mode: Mode; setMode: (m: M
                                     <span className="text-[10px] uppercase tracking-[0.14em]" style={{ fontFamily: "'JetBrains Mono', monospace", color: dark ? 'rgba(242,237,228,0.55)' : '#8c8a85' }}>{tag}</span>
                                     <h4 className="font-bold text-[17px] uppercase tracking-[0.02em] line-clamp-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{p.name}</h4>
                                     <div className="mt-auto flex items-center justify-between">
-                                        <span className="font-bold text-[18px]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{p.price.toLocaleString('ru-RU')} ₸</span>
+                                        <span className="font-bold text-[18px]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{p.price.toLocaleString(t.card_locale)} ₸</span>
                                         <span className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: dark ? '#c9a96e' : '#0b0b0c', color: dark ? '#1a0e00' : '#f2ede4' }}>
                                             <ArrowIcon size={14} />
                                         </span>

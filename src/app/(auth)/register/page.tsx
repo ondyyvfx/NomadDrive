@@ -5,15 +5,16 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, ArrowLeft, Car, Shield, Zap } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-
-const perks = [
-    { icon: Car, text: 'Доступ к 500+ автомобилям для аренды и покупки' },
-    { icon: Shield, text: 'Безопасный личный кабинет и история заказов' },
-    { icon: Zap, text: 'Быстрое оформление без лишних шагов' },
-]
+import { useDict } from '@/contexts/LanguageContext'
 
 export default function RegisterPage() {
     const router = useRouter()
+    const { auth: t } = useDict()
+    const perks = [
+        { icon: Car, text: t.regPerk1 },
+        { icon: Shield, text: t.regPerk2 },
+        { icon: Zap, text: t.regPerk3 },
+    ]
     const [fullName, setFullName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -27,7 +28,7 @@ export default function RegisterPage() {
         setError('')
 
         if (password.length < 6) {
-            setError('Пароль должен быть не менее 6 символов')
+            setError(t.pwTooShort)
             return
         }
 
@@ -46,9 +47,9 @@ export default function RegisterPage() {
             router.push('/')
             router.refresh()
         } catch (err: unknown) {
-            const msg = err instanceof Error ? err.message : 'Ошибка регистрации'
+            const msg = err instanceof Error ? err.message : t.regErr
             if (msg.includes('already registered')) {
-                setError('Этот email уже зарегистрирован')
+                setError(t.regErrExists)
             } else {
                 setError(msg)
             }
@@ -70,18 +71,18 @@ export default function RegisterPage() {
                         </div>
                     </div>
                     <h2 className="text-[24px] font-bold tracking-[-0.04em] mb-2 text-[#f0ece4]">
-                        Проверьте почту
+                        {t.checkEmailTitle}
                     </h2>
                     <p className="text-[#6b6b6b] text-[15px] leading-relaxed mb-8">
-                        Мы отправили письмо с подтверждением на{' '}
-                        <span className="text-[#f0ece4] font-medium">{email}</span>.
-                        Перейдите по ссылке в письме чтобы завершить регистрацию.
+                        {t.checkEmailSub1}{' '}
+                        <span className="text-[#f0ece4] font-medium">{email}</span>.{' '}
+                        {t.checkEmailSub2}
                     </p>
                     <Link
                         href="/login"
                         className="inline-flex h-11 px-6 bg-[#c9a96e] text-[#0a0a0a] font-semibold rounded-[10px] hover:bg-[#d4b87a] transition-all duration-300 items-center justify-center text-[15px]"
                     >
-                        Перейти ко входу
+                        {t.goToLogin}
                     </Link>
                 </div>
             </div>
@@ -110,10 +111,10 @@ export default function RegisterPage() {
 
                 <div className="relative z-10">
                     <h2 className="text-[#f0ece4] text-4xl font-bold tracking-[-0.04em] mb-3 leading-tight">
-                        Начните<br />прямо сейчас
+                        {t.startNowTitle}
                     </h2>
                     <p className="text-[#6b6b6b] text-[16px] mb-10 leading-relaxed font-light">
-                        Создайте аккаунт и получите доступ<br />ко всем возможностям платформы
+                        {t.startNowSub}
                     </p>
 
                     <div className="flex flex-col gap-4">
@@ -129,7 +130,7 @@ export default function RegisterPage() {
                 </div>
 
                 <p className="relative z-10 text-[#3d3d3d] text-[13px]">
-                    © 2026 NomadDrive · Алматы
+                    {t.copyright}
                 </p>
             </div>
 
@@ -141,19 +142,19 @@ export default function RegisterPage() {
                     className="md:hidden inline-flex items-center gap-1.5 text-[14px] text-[#6b6b6b] hover:text-[#f0ece4] mb-10 transition-colors w-fit"
                 >
                     <ArrowLeft size={16} />
-                    На главную
+                    {t.toHome}
                 </Link>
 
                 <div className="w-full max-w-[380px] mx-auto">
 
                     <div className="mb-8">
                         <h1 className="text-[28px] font-bold tracking-[-0.04em] mb-2 text-[#f0ece4]">
-                            Создать аккаунт
+                            {t.regTitle}
                         </h1>
                         <p className="text-[#6b6b6b] text-[15px]">
-                            Уже есть аккаунт?{' '}
+                            {t.haveAccount}{' '}
                             <Link href="/login" className="text-[#c9a96e] hover:underline font-medium">
-                                Войти
+                                {t.login}
                             </Link>
                         </p>
                     </div>
@@ -163,13 +164,13 @@ export default function RegisterPage() {
                         {/* Full name */}
                         <div className="flex flex-col gap-1.5">
                             <label className="text-[13px] font-medium text-[#6b6b6b]">
-                                Имя и фамилия
+                                {t.fullName}
                             </label>
                             <input
                                 type="text"
                                 value={fullName}
                                 onChange={e => setFullName(e.target.value)}
-                                placeholder="Алексей Иванов"
+                                placeholder={t.fullNamePlaceholder}
                                 required
                                 autoComplete="name"
                                 className="w-full h-11 px-3.5 bg-[#111111] border border-white/[0.10] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none transition-all duration-300 focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] focus:bg-[#161616]"
@@ -179,7 +180,7 @@ export default function RegisterPage() {
                         {/* Email */}
                         <div className="flex flex-col gap-1.5">
                             <label className="text-[13px] font-medium text-[#6b6b6b]">
-                                Email
+                                {t.email}
                             </label>
                             <input
                                 type="email"
@@ -195,14 +196,14 @@ export default function RegisterPage() {
                         {/* Password */}
                         <div className="flex flex-col gap-1.5">
                             <label className="text-[13px] font-medium text-[#6b6b6b]">
-                                Пароль
+                                {t.password}
                             </label>
                             <div className="relative">
                                 <input
                                     type={showPass ? 'text' : 'password'}
                                     value={password}
                                     onChange={e => setPassword(e.target.value)}
-                                    placeholder="Минимум 6 символов"
+                                    placeholder={t.pwPlaceholderMin}
                                     required
                                     autoComplete="new-password"
                                     className="w-full h-11 px-3.5 pr-11 bg-[#111111] border border-white/[0.10] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none transition-all duration-300 focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] focus:bg-[#161616]"
@@ -252,11 +253,11 @@ export default function RegisterPage() {
                             {loading && (
                                 <span className="w-4 h-4 border-2 border-[#0a0a0a]/30 border-t-[#0a0a0a] rounded-full animate-spin" />
                             )}
-                            {loading ? 'Создаём аккаунт...' : 'Создать аккаунт'}
+                            {loading ? t.creating : t.createAccount}
                         </button>
 
                         <p className="text-[12px] text-[#3d3d3d] text-center leading-relaxed">
-                            Регистрируясь, вы соглашаетесь с условиями использования платформы
+                            {t.regTerms}
                         </p>
 
                     </form>
@@ -266,7 +267,7 @@ export default function RegisterPage() {
                         className="hidden md:inline-flex items-center gap-1.5 text-[13px] text-[#3d3d3d] hover:text-[#6b6b6b] mt-8 transition-colors"
                     >
                         <ArrowLeft size={14} />
-                        На главную
+                        {t.toHome}
                     </Link>
 
                 </div>

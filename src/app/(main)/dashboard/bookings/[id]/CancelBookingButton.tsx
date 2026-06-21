@@ -4,9 +4,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { XCircle } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useDict } from '@/contexts/LanguageContext'
 
 export function CancelBookingButton({ bookingId }: { bookingId: string }) {
     const router = useRouter()
+    const { dash: t } = useDict()
     const [showSheet, setShowSheet] = useState(false)
     const [loading, setLoading] = useState(false)
 
@@ -32,22 +34,22 @@ export function CancelBookingButton({ bookingId }: { bookingId: string }) {
                         className="w-full h-11 border border-[#ff3b30]/30 text-[#ff3b30] text-[14px] font-medium rounded-[12px] hover:bg-[#ff3b30]/[0.06] transition-colors flex items-center justify-center gap-2"
                     >
                         <XCircle size={16} />
-                        Отменить бронирование
+                        {t.cancelBooking}
                     </button>
                 ) : (
                     <div className="bg-white border border-[#ff3b30]/20 rounded-[16px] p-5 scale-in">
                         <p className="text-[15px] font-semibold tracking-tight mb-1">
-                            Отменить бронирование?
+                            {t.cancelConfirm}
                         </p>
                         <p className="text-[13px] text-[#6e6e73] mb-4">
-                            Это действие нельзя отменить
+                            {t.cancelIrreversible}
                         </p>
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setShowSheet(false)}
                                 className="flex-1 h-10 bg-[#f5f5f7] text-[#1d1d1f] font-medium rounded-[10px] border border-black/[0.08] hover:bg-black/[0.04] transition-colors text-[14px]"
                             >
-                                Назад
+                                {t.back}
                             </button>
                             <button
                                 onClick={handleCancel}
@@ -55,7 +57,7 @@ export function CancelBookingButton({ bookingId }: { bookingId: string }) {
                                 className="flex-1 h-10 bg-[#ff3b30] text-white font-medium rounded-[10px] hover:bg-[#e0352b] transition-colors text-[14px] flex items-center justify-center gap-2 disabled:opacity-60"
                             >
                                 {loading && <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-                                Да, отменить
+                                {t.yesCancel}
                             </button>
                         </div>
                     </div>
@@ -68,7 +70,7 @@ export function CancelBookingButton({ bookingId }: { bookingId: string }) {
                 className="md:hidden w-full h-11 border border-[#ff3b30]/30 text-[#ff3b30] text-[14px] font-medium rounded-[12px] hover:bg-[#ff3b30]/[0.06] transition-colors flex items-center justify-center gap-2 fade-in-up"
             >
                 <XCircle size={16} />
-                Отменить бронирование
+                {t.cancelBooking}
             </button>
 
             {showSheet && (
@@ -80,8 +82,8 @@ export function CancelBookingButton({ bookingId }: { bookingId: string }) {
                     />
                     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-[20px] px-5 pt-5 pb-8 shadow-lg slide-in-from-bottom">
                         <div className="w-10 h-1 bg-black/[0.1] rounded-full mx-auto mb-6" />
-                        <p className="text-[17px] font-semibold tracking-tight mb-1">Отменить бронирование?</p>
-                        <p className="text-[14px] text-[#6e6e73] mb-6">Это действие нельзя отменить</p>
+                        <p className="text-[17px] font-semibold tracking-tight mb-1">{t.cancelConfirm}</p>
+                        <p className="text-[14px] text-[#6e6e73] mb-6">{t.cancelIrreversible}</p>
                         <div className="flex flex-col gap-3">
                             <button
                                 onClick={handleCancel}
@@ -89,13 +91,13 @@ export function CancelBookingButton({ bookingId }: { bookingId: string }) {
                                 className="w-full h-12 bg-[#ff3b30] text-white font-medium rounded-[12px] hover:bg-[#e0352b] transition-colors text-[16px] flex items-center justify-center gap-2 disabled:opacity-60"
                             >
                                 {loading && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-                                Да, отменить
+                                {t.yesCancel}
                             </button>
                             <button
                                 onClick={() => setShowSheet(false)}
                                 className="w-full h-12 bg-[#f5f5f7] text-[#1d1d1f] font-medium rounded-[12px] border border-black/[0.08] transition-colors text-[16px]"
                             >
-                                Назад
+                                {t.back}
                             </button>
                         </div>
                     </div>

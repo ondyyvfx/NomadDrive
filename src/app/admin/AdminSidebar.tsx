@@ -10,20 +10,23 @@ import {
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-
-const navItems = [
-    { href: '/admin', icon: LayoutDashboard, label: 'Обзор', exact: true },
-    { href: '/admin/cars', icon: Car, label: 'Аренда авто' },
-    { href: '/admin/sale', icon: ShoppingBag, label: 'Продажа' },
-    { href: '/admin/parts', icon: Wrench, label: 'Запчасти' },
-    { href: '/admin/bookings', icon: Calendar, label: 'Брони' },
-    { href: '/admin/orders', icon: Package, label: 'Заказы' },
-]
+import { useDict, useLanguage } from '@/contexts/LanguageContext'
 
 export function AdminSidebar() {
     const pathname = usePathname()
     const router = useRouter()
+    const { admin: t } = useDict()
+    const { lang, setLang } = useLanguage()
     const [open, setOpen] = useState(false)
+
+    const navItems = [
+        { href: '/admin', icon: LayoutDashboard, label: t.navOverview, exact: true },
+        { href: '/admin/cars', icon: Car, label: t.navRent },
+        { href: '/admin/sale', icon: ShoppingBag, label: t.navSale },
+        { href: '/admin/parts', icon: Wrench, label: t.navParts },
+        { href: '/admin/bookings', icon: Calendar, label: t.navBookings },
+        { href: '/admin/orders', icon: Package, label: t.navOrders },
+    ]
 
     async function handleLogout() {
         const supabase = createClient()
@@ -37,7 +40,7 @@ export function AdminSidebar() {
                 <Link href="/" className="font-semibold text-[18px] tracking-tight text-[#f0ece4]">
                     Nomad<span className="text-[#c9a96e]">Drive</span>
                 </Link>
-                <p className="text-[12px] text-[#6b6b6b] mt-0.5">Admin Panel</p>
+                <p className="text-[12px] text-[#6b6b6b] mt-0.5">{t.panel}</p>
             </div>
 
             <nav className="flex-1 px-3 py-4 flex flex-col gap-1">
@@ -62,19 +65,33 @@ export function AdminSidebar() {
             </nav>
 
             <div className="px-3 py-4 border-t border-white/[0.06]">
+                <div className="flex gap-1 mb-2 p-1 bg-[#161616] rounded-[10px]">
+                    {(['ru', 'kz'] as const).map(l => (
+                        <button
+                            key={l}
+                            onClick={() => setLang(l)}
+                            className={`flex-1 h-8 rounded-[7px] text-[13px] font-semibold transition-colors ${lang === l
+                                ? 'bg-[#c9a96e] text-[#0a0a0a]'
+                                : 'text-[#6b6b6b] hover:text-[#f0ece4]'
+                                }`}
+                        >
+                            {l === 'ru' ? 'РУС' : 'ҚАЗ'}
+                        </button>
+                    ))}
+                </div>
                 <Link
                     href="/"
                     className="flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[14px] font-medium text-[#6b6b6b] hover:bg-white/[0.04] hover:text-[#f0ece4] transition-all duration-200 mb-1"
                 >
                     <ChevronRight size={17} className="rotate-180" />
-                    На сайт
+                    {t.toSite}
                 </Link>
                 <button
                     onClick={handleLogout}
                     className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[14px] font-medium text-[#6b6b6b] hover:bg-[#ff3b30]/[0.08] hover:text-[#ff3b30] transition-all duration-200"
                 >
                     <LogOut size={17} />
-                    Выйти
+                    {t.logout}
                 </button>
             </div>
         </div>

@@ -6,19 +6,8 @@ import {
     ChevronLeft, Shield, Star, CheckCircle2
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
+import { getServerDict } from '@/lib/i18n.server'
 import { BookingWidget } from './BookingWidget'
-
-const transmissionLabel: Record<string, string> = {
-    auto: 'Автомат', manual: 'Механика',
-}
-const fuelLabel: Record<string, string> = {
-    petrol: 'Бензин', diesel: 'Дизель', electric: 'Электро', hybrid: 'Гибрид',
-}
-const statusConfig: Record<string, { label: string; classes: string }> = {
-    available: { label: 'Доступен', classes: 'text-[#34c759]' },
-    rented: { label: 'Занят', classes: 'text-[#ff9f0a]' },
-    maintenance: { label: 'На ТО', classes: 'text-[#6b6b6b]' },
-}
 
 export async function generateMetadata({
     params,
@@ -27,14 +16,15 @@ export async function generateMetadata({
 }) {
     const { id } = await params
     const supabase = await createClient()
+    const { detail: t } = await getServerDict()
     const { data: car } = await supabase
         .from('cars_for_rent')
         .select('brand, model, year')
         .eq('id', id)
         .single()
 
-    if (!car) return { title: 'Автомобиль не найден' }
-    return { title: `${car.brand} ${car.model} ${car.year} — Аренда` }
+    if (!car) return { title: t.notFound }
+    return { title: `${car.brand} ${car.model} ${car.year} — ${t.rentSuffix}` }
 }
 
 export default async function CarPage({
@@ -44,6 +34,19 @@ export default async function CarPage({
 }) {
     const { id } = await params
     const supabase = await createClient()
+    const { detail: t, rent: r, common } = await getServerDict()
+
+    const transmissionLabel: Record<string, string> = {
+        auto: r.auto, manual: r.manual,
+    }
+    const fuelLabel: Record<string, string> = {
+        petrol: r.petrol, diesel: r.diesel, electric: r.electric, hybrid: r.hybrid,
+    }
+    const statusConfig: Record<string, { label: string; classes: string }> = {
+        available: { label: r.statusAvailable, classes: 'text-[#34c759]' },
+        rented: { label: r.statusRented, classes: 'text-[#ff9f0a]' },
+        maintenance: { label: r.statusMaintenance, classes: 'text-[#6b6b6b]' },
+    }
 
     const { data: car } = await supabase
         .from('cars_for_rent')
@@ -77,7 +80,7 @@ export default async function CarPage({
                     className="inline-flex items-center gap-1.5 text-[14px] text-[#6b6b6b] hover:text-[#f0ece4] transition-colors"
                 >
                     <ChevronLeft size={16} />
-                    Каталог аренды
+                    {t.catalog}
                 </Link>
                 <span className="text-[#3d3d3d]">/</span>
                 <span className="text-[14px] text-[#f0ece4]">
@@ -138,13 +141,13 @@ export default async function CarPage({
                                 <h1 className="text-2xl md:text-3xl font-bold tracking-[-0.04em] mb-1 text-[#f0ece4]">
                                     {car.brand} {car.model}
                                 </h1>
-                                <p className="text-[#6b6b6b] text-[16px]">{car.year} год выпуска</p>
+                                <p className="text-[#6b6b6b] text-[16px]">{car.year} {t.yearMade}</p>
                             </div>
                             <div className="text-right">
                                 <p className="text-2xl font-bold tracking-tight text-[#f0ece4]">
-                                    {car.price_per_day.toLocaleString('ru-RU')} ₸
+                                    {car.price_per_day.toLocaleString(common.locale)} ₸
                                 </p>
-                                <p className="text-[13px] text-[#6b6b6b]">за сутки</p>
+                                <p className="text-[13px] text-[#6b6b6b]">{t.perDayShort}</p>
                             </div>
                         </div>
                     </div>
@@ -152,34 +155,34 @@ export default async function CarPage({
                     {/* Характеристики */}
                     <div className="bg-[#111111] border border-white/[0.07] rounded-[14px] p-5 fade-in-up">
                         <h2 className="text-[16px] font-bold tracking-tight mb-4 text-[#f0ece4]">
-                            Характеристики
+                            {t.specs}
                         </h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             {car.transmission && (
                                 <SpecItem
                                     icon={<Settings2 size={16} />}
-                                    label="Коробка"
+                                    label={t.specTransmission}
                                     value={transmissionLabel[car.transmission]}
                                 />
                             )}
                             {car.fuel_type && (
                                 <SpecItem
                                     icon={<Fuel size={16} />}
-                                    label="Топливо"
+                                    label={t.specFuel}
                                     value={fuelLabel[car.fuel_type]}
                                 />
                             )}
                             {car.seats && (
                                 <SpecItem
                                     icon={<Users size={16} />}
-                                    label="Мест"
+                                    label={t.specSeats}
                                     value={String(car.seats)}
                                 />
                             )}
                             {car.location && (
                                 <SpecItem
                                     icon={<MapPin size={16} />}
-                                    label="Локация"
+                                    label={t.specLocation}
                                     value={car.location}
                                 />
                             )}
@@ -190,7 +193,7 @@ export default async function CarPage({
                     {car.description && (
                         <div className="fade-in-up">
                             <h2 className="text-[16px] font-bold tracking-tight mb-3 text-[#f0ece4]">
-                                Описание
+                                {t.description}
                             </h2>
                             <p className="text-[15px] text-[#6b6b6b] leading-relaxed">
                                 {car.description}
@@ -202,7 +205,7 @@ export default async function CarPage({
                     {car.features?.length > 0 && (
                         <div className="fade-in-up">
                             <h2 className="text-[16px] font-bold tracking-tight mb-3 text-[#f0ece4]">
-                                Комплектация
+                                {t.features}
                             </h2>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                 {car.features.map((f: string) => (
@@ -218,9 +221,9 @@ export default async function CarPage({
                     {/* Гарантии */}
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 fade-in-up">
                         {[
-                            { icon: Shield, text: 'Страховка включена' },
-                            { icon: Star, text: 'Проверенный автомобиль' },
-                            { icon: Calendar, text: 'Бесплатная отмена за 24ч' },
+                            { icon: Shield, text: t.guaranteeInsurance },
+                            { icon: Star, text: t.guaranteeVerified },
+                            { icon: Calendar, text: t.guaranteeCancel },
                         ].map(({ icon: Icon, text }) => (
                             <div
                                 key={text}
@@ -245,7 +248,7 @@ export default async function CarPage({
             {similar && similar.length > 0 && (
                 <div className="mt-16 fade-in-up">
                     <h2 className="text-[20px] font-bold tracking-tight mb-6 text-[#f0ece4]">
-                        Другие {car.brand}
+                        {t.otherOf} {car.brand}
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 stagger-children">
                         {similar.map(s => (
@@ -272,8 +275,8 @@ export default async function CarPage({
                                     </p>
                                     <p className="text-[13px] text-[#6b6b6b] mt-0.5">{s.year}</p>
                                     <p className="text-[14px] font-bold text-[#c9a96e] mt-2">
-                                        {s.price_per_day.toLocaleString('ru-RU')} ₸
-                                        <span className="text-[12px] font-normal text-[#6b6b6b]">/день</span>
+                                        {s.price_per_day.toLocaleString(common.locale)} ₸
+                                        <span className="text-[12px] font-normal text-[#6b6b6b]">{t.daySuffix}</span>
                                     </p>
                                 </div>
                             </Link>

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getServerDict } from '@/lib/i18n.server'
 import { AdminCarForm } from './AdminCarForm'
 
 export default async function AdminCarEditPage({
@@ -9,6 +10,7 @@ export default async function AdminCarEditPage({
 }) {
     const { id } = await params
     const supabase = await createClient()
+    const { admin: t } = await getServerDict()
 
     const isNew = id === 'new'
     const car = isNew ? null : await supabase
@@ -23,7 +25,7 @@ export default async function AdminCarEditPage({
     return (
         <div className="max-w-[700px]">
             <h1 className="text-2xl font-semibold tracking-tight mb-8 fade-in">
-                {isNew ? 'Новый автомобиль' : `${car?.brand} ${car?.model}`}
+                {isNew ? t.newCar : `${car?.brand} ${car?.model}`}
             </h1>
             <AdminCarForm car={car} />
         </div>

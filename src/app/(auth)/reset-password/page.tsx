@@ -5,9 +5,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, CheckCircle2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useDict } from '@/contexts/LanguageContext'
 
 export default function ResetPasswordPage() {
     const router = useRouter()
+    const { auth: t } = useDict()
     const [password, setPassword] = useState('')
     const [showPass, setShowPass] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -30,7 +32,7 @@ export default function ResetPasswordPage() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault()
         if (password.length < 6) {
-            setError('Минимум 6 символов')
+            setError(t.resetErrShort)
             return
         }
         setError('')
@@ -42,7 +44,7 @@ export default function ResetPasswordPage() {
             setDone(true)
             setTimeout(() => router.push('/dashboard'), 1800)
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Не удалось обновить пароль')
+            setError(err instanceof Error ? err.message : t.resetErr)
         } finally {
             setLoading(false)
         }
@@ -58,33 +60,33 @@ export default function ResetPasswordPage() {
                             <CheckCircle2 size={26} className="text-[#34c759]" />
                         </div>
                         <h1 className="text-[24px] font-bold tracking-[-0.04em] mb-2 text-[#f0ece4]">
-                            Пароль обновлён
+                            {t.resetDoneTitle}
                         </h1>
-                        <p className="text-[15px] text-[#6b6b6b]">Перенаправляем в личный кабинет...</p>
+                        <p className="text-[15px] text-[#6b6b6b]">{t.resetDoneSub}</p>
                     </div>
                 ) : (
                     <>
                         <div className="mb-8">
                             <h1 className="text-[28px] font-bold tracking-[-0.04em] mb-2 text-[#f0ece4]">
-                                Новый пароль
+                                {t.resetTitle}
                             </h1>
                             <p className="text-[#6b6b6b] text-[15px]">
-                                Придумайте новый пароль для вашего аккаунта.
+                                {t.resetSub}
                             </p>
                         </div>
 
                         {!ready && !error && (
                             <p className="text-[14px] text-[#6b6b6b] mb-4">
-                                Откройте эту страницу по ссылке из письма, чтобы сбросить пароль.{' '}
+                                {t.resetHint}{' '}
                                 <Link href="/forgot-password" className="text-[#c9a96e] hover:underline">
-                                    Запросить ссылку
+                                    {t.resetRequestLink}
                                 </Link>
                             </p>
                         )}
 
                         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                             <div className="flex flex-col gap-1.5">
-                                <label className="text-[13px] font-medium text-[#6b6b6b]">Пароль</label>
+                                <label className="text-[13px] font-medium text-[#6b6b6b]">{t.password}</label>
                                 <div className="relative">
                                     <input
                                         type={showPass ? 'text' : 'password'}
@@ -119,7 +121,7 @@ export default function ResetPasswordPage() {
                                 {loading && (
                                     <span className="w-4 h-4 border-2 border-[#0a0a0a]/30 border-t-[#0a0a0a] rounded-full animate-spin" />
                                 )}
-                                {loading ? 'Сохранение...' : 'Сохранить пароль'}
+                                {loading ? t.saving : t.savePassword}
                             </button>
                         </form>
                     </>

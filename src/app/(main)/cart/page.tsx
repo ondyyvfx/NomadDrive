@@ -9,12 +9,14 @@ import {
     Package, ChevronRight, ArrowLeft, Tag
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useDict } from '@/contexts/LanguageContext'
 import type { CartItem } from '@/types'
 
 const CART_KEY = 'nomaddrive_cart'
 
 export default function CartPage() {
     const router = useRouter()
+    const { cart: t, common } = useDict()
     const [cart, setCart] = useState<CartItem[]>([])
     const [mounted, setMounted] = useState(false)
     const [promoCode, setPromoCode] = useState('')
@@ -69,15 +71,15 @@ export default function CartPage() {
                 .eq('is_active', true)
                 .single()
 
-            if (error || !data) throw new Error('Промокод не найден')
+            if (error || !data) throw new Error(t.promoNotFound)
             if (data.expires_at && new Date(data.expires_at) < new Date())
-                throw new Error('Промокод истёк')
+                throw new Error(t.promoExpired)
             if (data.max_uses && data.used_count >= data.max_uses)
-                throw new Error('Промокод исчерпан')
+                throw new Error(t.promoUsedUp)
 
             setPromoApplied({ code: data.code, discount: data.value, type: data.type })
         } catch (err: unknown) {
-            setPromoError(err instanceof Error ? err.message : 'Ошибка')
+            setPromoError(err instanceof Error ? err.message : t.error)
         } finally {
             setPromoLoading(false)
         }
@@ -152,7 +154,7 @@ export default function CartPage() {
                         className="inline-flex items-center gap-1.5 text-[14px] text-[#6b6b6b] hover:text-[#f0ece4] transition-colors"
                     >
                         <ArrowLeft size={16} />
-                        Запчасти
+                        {t.backParts}
                     </Link>
                 </div>
 
@@ -161,16 +163,16 @@ export default function CartPage() {
                         <ShoppingCart size={32} className="text-[#3d3d3d]" />
                     </div>
                     <h1 className="text-[24px] font-bold tracking-tight mb-2 text-[#f0ece4]">
-                        Корзина пуста
+                        {t.emptyTitle}
                     </h1>
                     <p className="text-[15px] text-[#6b6b6b] mb-8 max-w-xs mx-auto">
-                        Добавьте запчасти из каталога чтобы оформить заказ
+                        {t.emptySub}
                     </p>
                     <Link
                         href="/parts"
                         className="inline-flex h-12 px-8 bg-[#c9a96e] text-[#0a0a0a] font-semibold rounded-[10px] hover:bg-[#d4b87a] transition-all duration-300 items-center gap-2 text-[15px]"
                     >
-                        Перейти в каталог
+                        {t.toCatalog}
                         <ChevronRight size={16} />
                     </Link>
                 </div>
@@ -189,12 +191,12 @@ export default function CartPage() {
                         className="inline-flex items-center gap-1.5 text-[14px] text-[#6b6b6b] hover:text-[#f0ece4] transition-colors mb-2"
                     >
                         <ArrowLeft size={16} />
-                        Продолжить покупки
+                        {t.continueShopping}
                     </Link>
                     <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[#f0ece4]">
-                        Корзина
+                        {t.title}
                         <span className="ml-2 text-[#3d3d3d] font-normal text-xl">
-                            {totalItems} {totalItems === 1 ? 'товар' : totalItems < 5 ? 'товара' : 'товаров'}
+                            {totalItems} {totalItems === 1 ? t.itemOne : totalItems < 5 ? t.itemFew : t.itemMany}
                         </span>
                     </h1>
                 </div>
@@ -204,7 +206,7 @@ export default function CartPage() {
                     className="hidden md:inline-flex items-center gap-2 text-[14px] text-[#6b6b6b] hover:text-[#ff3b30] transition-colors"
                 >
                     <Trash2 size={15} />
-                    Очистить корзину
+                    {t.clear}
                 </button>
             </div>
 
@@ -240,7 +242,7 @@ export default function CartPage() {
                                     {item.name}
                                 </p>
                                 <p className="text-[13px] text-[#6b6b6b] mb-3">
-                                    {item.price.toLocaleString('ru-RU')} ₸ / шт.
+                                    {item.price.toLocaleString(common.locale)} ₸ {t.perPcs}
                                 </p>
 
                                 <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -266,7 +268,7 @@ export default function CartPage() {
                                     {/* Сумма + удалить */}
                                     <div className="flex items-center gap-3">
                                         <p className="text-[16px] font-bold text-[#f0ece4]">
-                                            {(item.price * item.quantity).toLocaleString('ru-RU')} ₸
+                                            {(item.price * item.quantity).toLocaleString(common.locale)} ₸
                                         </p>
 
                                         {/* Desktop — кнопка удалить */}
@@ -296,7 +298,7 @@ export default function CartPage() {
                         className="md:hidden inline-flex items-center justify-center gap-2 h-11 text-[14px] text-[#6b6b6b] hover:text-[#ff3b30] transition-colors border border-white/[0.08] rounded-[10px]"
                     >
                         <Trash2 size={15} />
-                        Очистить корзину
+                        {t.clear}
                     </button>
                 </div>
 
@@ -305,7 +307,7 @@ export default function CartPage() {
                     <div className="bg-[#111111] border border-white/[0.08] rounded-[20px] shadow-lg overflow-hidden scale-in">
 
                         <div className="px-6 pt-6 pb-4 border-b border-white/[0.06]">
-                            <p className="text-[17px] font-bold tracking-tight text-[#f0ece4]">Итого заказа</p>
+                            <p className="text-[17px] font-bold tracking-tight text-[#f0ece4]">{t.summary}</p>
                         </div>
 
                         <div className="p-6 flex flex-col gap-5">
@@ -314,7 +316,7 @@ export default function CartPage() {
                             <div>
                                 <p className="text-[13px] font-medium text-[#6b6b6b] mb-2 flex items-center gap-1.5">
                                     <Tag size={13} />
-                                    Промокод
+                                    {t.promo}
                                 </p>
                                 <div className="flex gap-2">
                                     <input
@@ -342,7 +344,7 @@ export default function CartPage() {
                                             disabled={promoLoading || !promoCode.trim()}
                                             className="h-10 px-4 bg-[#1a1a1a] border border-white/[0.08] rounded-[10px] text-[13px] font-medium text-[#f0ece4] hover:bg-white/[0.04] transition-colors disabled:opacity-40"
                                         >
-                                            {promoLoading ? '...' : 'Применить'}
+                                            {promoLoading ? '...' : t.apply}
                                         </button>
                                     )}
                                 </div>
@@ -351,10 +353,10 @@ export default function CartPage() {
                                 )}
                                 {promoApplied && (
                                     <p className="text-[12px] text-[#34c759] mt-1.5">
-                                        ✓ {promoApplied.code} — скидка{' '}
+                                        ✓ {promoApplied.code} — {t.discountWord}{' '}
                                         {promoApplied.type === 'percent'
                                             ? `${promoApplied.discount}%`
-                                            : `${promoApplied.discount.toLocaleString('ru-RU')} ₸`}
+                                            : `${promoApplied.discount.toLocaleString(common.locale)} ₸`}
                                     </p>
                                 )}
                             </div>
@@ -363,29 +365,29 @@ export default function CartPage() {
                             <div className="flex flex-col gap-2.5">
                                 <div className="flex justify-between text-[14px]">
                                     <span className="text-[#6b6b6b]">
-                                        Товары ({totalItems} шт.)
+                                        {t.products} ({totalItems} {t.pcs})
                                     </span>
                                     <span className="font-medium text-[#f0ece4]">
-                                        {subtotal.toLocaleString('ru-RU')} ₸
+                                        {subtotal.toLocaleString(common.locale)} ₸
                                     </span>
                                 </div>
                                 {discount > 0 && (
                                     <div className="flex justify-between text-[14px]">
-                                        <span className="text-[#6b6b6b]">Скидка</span>
+                                        <span className="text-[#6b6b6b]">{t.discount}</span>
                                         <span className="text-[#34c759] font-medium">
-                                            −{discount.toLocaleString('ru-RU')} ₸
+                                            −{discount.toLocaleString(common.locale)} ₸
                                         </span>
                                     </div>
                                 )}
                                 <div className="flex justify-between text-[14px]">
-                                    <span className="text-[#6b6b6b]">Доставка</span>
-                                    <span className="text-[#34c759] font-medium">Бесплатно</span>
+                                    <span className="text-[#6b6b6b]">{t.delivery}</span>
+                                    <span className="text-[#34c759] font-medium">{t.free}</span>
                                 </div>
                                 <div className="h-px bg-white/[0.06] my-1" />
                                 <div className="flex justify-between">
-                                    <span className="text-[16px] font-bold text-[#f0ece4]">К оплате</span>
+                                    <span className="text-[16px] font-bold text-[#f0ece4]">{t.toPay}</span>
                                     <span className="text-[16px] font-bold text-[#c9a96e]">
-                                        {totalPrice.toLocaleString('ru-RU')} ₸
+                                        {totalPrice.toLocaleString(common.locale)} ₸
                                     </span>
                                 </div>
                             </div>
@@ -400,14 +402,14 @@ export default function CartPage() {
                                     <span className="w-5 h-5 border-2 border-[#0a0a0a]/30 border-t-[#0a0a0a] rounded-full animate-spin" />
                                 ) : (
                                     <>
-                                        Оформить заказ
+                                        {t.checkout}
                                         <ChevronRight size={16} />
                                     </>
                                 )}
                             </button>
 
                             <p className="text-[12px] text-[#3d3d3d] text-center leading-relaxed">
-                                Оформляя заказ, вы соглашаетесь с условиями платформы
+                                {t.terms}
                             </p>
 
                         </div>
@@ -426,7 +428,7 @@ export default function CartPage() {
                     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#111111] rounded-t-[20px] px-5 pt-5 pb-8 shadow-lg border-t border-white/[0.06] slide-in-from-bottom">
                         <div className="w-10 h-1 bg-white/[0.10] rounded-full mx-auto mb-6" />
                         <p className="text-[17px] font-bold tracking-tight mb-1 text-[#f0ece4]">
-                            Удалить товар?
+                            {t.deleteItem}
                         </p>
                         <p className="text-[14px] text-[#6b6b6b] mb-6">
                             {cart.find(i => i.product_id === deleteId)?.name}
@@ -436,13 +438,13 @@ export default function CartPage() {
                                 onClick={() => removeItem(deleteId)}
                                 className="w-full h-12 bg-[#ff3b30] text-white font-semibold rounded-[12px] hover:bg-[#e0352b] transition-colors text-[16px]"
                             >
-                                Удалить
+                                {t.delete}
                             </button>
                             <button
                                 onClick={() => setDeleteId(null)}
                                 className="w-full h-12 bg-[#1a1a1a] text-[#f0ece4] font-medium rounded-[12px] border border-white/[0.08] hover:bg-white/[0.04] transition-colors text-[16px]"
                             >
-                                Отмена
+                                {t.cancel}
                             </button>
                         </div>
                     </div>

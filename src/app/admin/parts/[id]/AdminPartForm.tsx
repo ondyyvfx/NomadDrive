@@ -3,11 +3,13 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useDict } from '@/contexts/LanguageContext'
 import type { Part } from '@/types'
 import { Trash2 } from 'lucide-react'
 
 export function AdminPartForm({ part }: { part: Part | null }) {
     const router = useRouter()
+    const { admin: t } = useDict()
     const isNew = !part
 
     const [form, setForm] = useState({
@@ -66,7 +68,7 @@ export function AdminPartForm({ part }: { part: Part | null }) {
             router.push('/admin/parts')
             router.refresh()
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Ошибка сохранения')
+            setError(err instanceof Error ? err.message : t.saveError)
         } finally {
             setLoading(false)
         }
@@ -87,72 +89,72 @@ export function AdminPartForm({ part }: { part: Part | null }) {
         <div className="flex flex-col gap-5 fade-in-up">
 
             <div className="bg-[#111111] border border-white/[0.07] rounded-[16px] p-6">
-                <h2 className="text-[15px] font-bold tracking-tight mb-5 text-[#f0ece4]">Основное</h2>
+                <h2 className="text-[15px] font-bold tracking-tight mb-5 text-[#f0ece4]">{t.sectionMain}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="sm:col-span-2">
-                        <label className={labelCls}>Название</label>
+                        <label className={labelCls}>{t.fName}</label>
                         <input className={inputCls} value={form.name} onChange={e => set('name', e.target.value)} placeholder="Масляный фильтр" />
                     </div>
                     <div>
-                        <label className={labelCls}>Производитель</label>
+                        <label className={labelCls}>{t.fManufacturer}</label>
                         <input className={inputCls} value={form.brand} onChange={e => set('brand', e.target.value)} placeholder="Toyota" />
                     </div>
                     <div>
-                        <label className={labelCls}>Категория</label>
-                        <input className={inputCls} value={form.category} onChange={e => set('category', e.target.value)} placeholder="Фильтры" />
+                        <label className={labelCls}>{t.fCategory}</label>
+                        <input className={inputCls} value={form.category} onChange={e => set('category', e.target.value)} />
                     </div>
                     <div>
-                        <label className={labelCls}>OEM номер</label>
+                        <label className={labelCls}>{t.fOem}</label>
                         <input className={inputCls} value={form.oem_number} onChange={e => set('oem_number', e.target.value)} placeholder="90915-YZZD4" />
                     </div>
                     <div>
-                        <label className={labelCls}>Цена (₸)</label>
+                        <label className={labelCls}>{t.fPrice}</label>
                         <input className={inputCls} type="number" value={form.price} onChange={e => set('price', e.target.value)} />
                     </div>
                     <div>
-                        <label className={labelCls}>В наличии (шт.)</label>
+                        <label className={labelCls}>{t.fStock}</label>
                         <input className={inputCls} type="number" value={form.stock} onChange={e => set('stock', e.target.value)} />
                     </div>
                 </div>
             </div>
 
             <div className="bg-[#111111] border border-white/[0.07] rounded-[16px] p-6">
-                <h2 className="text-[15px] font-bold tracking-tight mb-5 text-[#f0ece4]">Совместимость</h2>
+                <h2 className="text-[15px] font-bold tracking-tight mb-5 text-[#f0ece4]">{t.sectionCompat}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label className={labelCls}>Марка авто</label>
+                        <label className={labelCls}>{t.fCarBrand}</label>
                         <input className={inputCls} value={form.car_brand} onChange={e => set('car_brand', e.target.value)} placeholder="Toyota" />
                     </div>
                     <div>
-                        <label className={labelCls}>Модель авто</label>
+                        <label className={labelCls}>{t.fCarModel}</label>
                         <input className={inputCls} value={form.car_model} onChange={e => set('car_model', e.target.value)} placeholder="Camry" />
                     </div>
                     <div>
-                        <label className={labelCls}>Год от</label>
+                        <label className={labelCls}>{t.fYearFrom}</label>
                         <input className={inputCls} type="number" value={form.year_from} onChange={e => set('year_from', e.target.value)} placeholder="2018" />
                     </div>
                     <div>
-                        <label className={labelCls}>Год до</label>
+                        <label className={labelCls}>{t.fYearTo}</label>
                         <input className={inputCls} type="number" value={form.year_to} onChange={e => set('year_to', e.target.value)} placeholder="2024" />
                     </div>
                 </div>
             </div>
 
             <div className="bg-[#111111] border border-white/[0.07] rounded-[16px] p-6">
-                <h2 className="text-[15px] font-bold tracking-tight mb-5 text-[#f0ece4]">Описание и фото</h2>
+                <h2 className="text-[15px] font-bold tracking-tight mb-5 text-[#f0ece4]">{t.sectionDescPhoto}</h2>
                 <div className="flex flex-col gap-4">
                     <div>
-                        <label className={labelCls}>Описание</label>
+                        <label className={labelCls}>{t.fDescription}</label>
                         <textarea
                             className="w-full px-3.5 py-3 bg-[#111111] border border-white/[0.10] rounded-[10px] text-[15px] text-[#f0ece4] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.12] focus:bg-[#161616] transition-all resize-none"
                             rows={3}
                             value={form.description}
                             onChange={e => set('description', e.target.value)}
-                            placeholder="Описание запчасти..."
+                            placeholder={t.phDescPart}
                         />
                     </div>
                     <div>
-                        <label className={labelCls}>Ссылки на фото (каждая с новой строки)</label>
+                        <label className={labelCls}>{t.fPhotos}</label>
                         <textarea
                             className="w-full px-3.5 py-3 bg-[#111111] border border-white/[0.10] rounded-[10px] text-[14px] text-[#f0ece4] font-mono outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.12] focus:bg-[#161616] transition-all resize-none"
                             rows={3}
@@ -171,7 +173,7 @@ export function AdminPartForm({ part }: { part: Part | null }) {
                     onClick={() => router.back()}
                     className="h-11 px-5 bg-[#1a1a1a] text-[#f0ece4] font-medium rounded-[10px] border border-white/[0.08] hover:bg-white/[0.04] transition-colors text-[15px]"
                 >
-                    Отмена
+                    {t.cancel}
                 </button>
                 <button
                     onClick={handleSave}
@@ -179,7 +181,7 @@ export function AdminPartForm({ part }: { part: Part | null }) {
                     className="flex-1 h-11 bg-[#c9a96e] text-[#0a0a0a] font-semibold rounded-[10px] hover:bg-[#d4b87a] transition-colors text-[15px] flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                     {loading && <span className="w-4 h-4 border-2 border-[#0a0a0a]/30 border-t-[#0a0a0a] rounded-full animate-spin" />}
-                    {isNew ? 'Создать' : 'Сохранить'}
+                    {isNew ? t.create : t.save}
                 </button>
                 {!isNew && (
                     <button
@@ -194,27 +196,27 @@ export function AdminPartForm({ part }: { part: Part | null }) {
             {showDel && (
                 <>
                     <div className="hidden md:block bg-[#111111] border border-[#ff3b30]/20 rounded-[16px] p-5 scale-in">
-                        <p className="text-[15px] font-semibold mb-1 text-[#f0ece4]">Удалить запчасть?</p>
-                        <p className="text-[13px] text-[#6b6b6b] mb-4">Это действие нельзя отменить</p>
+                        <p className="text-[15px] font-semibold mb-1 text-[#f0ece4]">{t.delPartTitle}</p>
+                        <p className="text-[13px] text-[#6b6b6b] mb-4">{t.delIrreversible}</p>
                         <div className="flex gap-3">
-                            <button onClick={() => setShowDel(false)} className="flex-1 h-10 bg-[#1a1a1a] border border-white/[0.08] rounded-[10px] text-[14px] font-medium text-[#f0ece4] hover:bg-white/[0.04] transition-colors">Отмена</button>
+                            <button onClick={() => setShowDel(false)} className="flex-1 h-10 bg-[#1a1a1a] border border-white/[0.08] rounded-[10px] text-[14px] font-medium text-[#f0ece4] hover:bg-white/[0.04] transition-colors">{t.cancel}</button>
                             <button onClick={handleDelete} disabled={loading} className="flex-1 h-10 bg-[#ff3b30] text-white rounded-[10px] text-[14px] font-medium hover:bg-[#e0352b] transition-colors flex items-center justify-center gap-2 disabled:opacity-60">
                                 {loading && <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-                                Удалить
+                                {t.delete}
                             </button>
                         </div>
                     </div>
                     <div className="md:hidden fixed inset-0 z-40 bg-black/60" onClick={() => setShowDel(false)} />
                     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#111111] border-t border-white/[0.06] rounded-t-[20px] px-5 pt-5 pb-8 shadow-xl slide-in-from-bottom">
                         <div className="w-10 h-1 bg-white/[0.10] rounded-full mx-auto mb-6" />
-                        <p className="text-[17px] font-bold mb-1 text-[#f0ece4]">Удалить запчасть?</p>
-                        <p className="text-[14px] text-[#6b6b6b] mb-6">Это действие нельзя отменить</p>
+                        <p className="text-[17px] font-bold mb-1 text-[#f0ece4]">{t.delPartTitle}</p>
+                        <p className="text-[14px] text-[#6b6b6b] mb-6">{t.delIrreversible}</p>
                         <div className="flex flex-col gap-3">
                             <button onClick={handleDelete} disabled={loading} className="w-full h-12 bg-[#ff3b30] text-white font-medium rounded-[12px] text-[16px] flex items-center justify-center gap-2 disabled:opacity-60">
                                 {loading && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-                                Удалить
+                                {t.delete}
                             </button>
-                            <button onClick={() => setShowDel(false)} className="w-full h-12 bg-[#1a1a1a] text-[#f0ece4] font-medium rounded-[12px] border border-white/[0.08] text-[16px]">Отмена</button>
+                            <button onClick={() => setShowDel(false)} className="w-full h-12 bg-[#1a1a1a] text-[#f0ece4] font-medium rounded-[12px] border border-white/[0.08] text-[16px]">{t.cancel}</button>
                         </div>
                     </div>
                 </>

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { User, Mail, Phone, CheckCircle2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useDict } from '@/contexts/LanguageContext'
 
 interface Profile {
     id: string
@@ -14,6 +15,7 @@ interface Profile {
 
 export function ProfileForm({ profile, email }: { profile: Profile | null; email: string }) {
     const router = useRouter()
+    const { dash: t } = useDict()
     const [fullName, setFullName] = useState(profile?.full_name ?? '')
     const [phone, setPhone] = useState(profile?.phone ?? '')
     const [loading, setLoading] = useState(false)
@@ -37,7 +39,7 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
             router.refresh()
             setTimeout(() => setSuccess(false), 3000)
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Ошибка сохранения')
+            setError(err instanceof Error ? err.message : t.saveError)
         } finally {
             setLoading(false)
         }
@@ -53,12 +55,12 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
                     </div>
                     <div>
                         <p className="text-[17px] font-bold tracking-tight text-[#f0ece4]">
-                            {profile?.full_name ?? 'Не указано'}
+                            {profile?.full_name ?? t.notSpecified}
                         </p>
                         <p className="text-[13px] text-[#6b6b6b]">{email}</p>
                         {profile?.role === 'admin' && (
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-[#c9a96e]/[0.08] text-[#c9a96e] mt-1">
-                                Администратор
+                                {t.adminBadge}
                             </span>
                         )}
                     </div>
@@ -67,7 +69,7 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
 
             <div className="bg-[#111111] border border-white/[0.07] rounded-[16px] p-6">
                 <h2 className="text-[15px] font-bold tracking-tight mb-5 text-[#f0ece4]">
-                    Личные данные
+                    {t.personalData}
                 </h2>
                 <div className="flex flex-col gap-4">
 
@@ -87,13 +89,13 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
                     <div className="flex flex-col gap-1.5">
                         <label className="text-[13px] font-medium text-[#6b6b6b] flex items-center gap-1.5">
                             <User size={13} />
-                            Имя и фамилия
+                            {t.fullName}
                         </label>
                         <input
                             type="text"
                             value={fullName}
                             onChange={e => setFullName(e.target.value)}
-                            placeholder="Алексей Иванов"
+                            placeholder={t.fullNamePlaceholder}
                             className="w-full h-11 px-3.5 bg-[#111111] border border-white/[0.10] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.12] focus:bg-[#161616] transition-all"
                         />
                     </div>
@@ -101,13 +103,13 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
                     <div className="flex flex-col gap-1.5">
                         <label className="text-[13px] font-medium text-[#6b6b6b] flex items-center gap-1.5">
                             <Phone size={13} />
-                            Телефон
+                            {t.phone}
                         </label>
                         <input
                             type="tel"
                             value={phone}
                             onChange={e => setPhone(e.target.value)}
-                            placeholder="+7 (777) 123-45-67"
+                            placeholder={t.phonePlaceholder}
                             className="w-full h-11 px-3.5 bg-[#111111] border border-white/[0.10] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.12] focus:bg-[#161616] transition-all"
                         />
                     </div>
@@ -119,7 +121,7 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
                     {success && (
                         <div className="flex items-center gap-2 text-[13px] text-[#34c759] fade-in">
                             <CheckCircle2 size={15} />
-                            Профиль успешно сохранён
+                            {t.profileSaved}
                         </div>
                     )}
 
@@ -131,7 +133,7 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
                         {loading && (
                             <span className="w-4 h-4 border-2 border-[#0a0a0a]/30 border-t-[#0a0a0a] rounded-full animate-spin" />
                         )}
-                        {loading ? 'Сохраняем...' : 'Сохранить изменения'}
+                        {loading ? t.saving : t.saveChanges}
                     </button>
                 </div>
             </div>

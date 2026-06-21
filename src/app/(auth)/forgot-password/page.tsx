@@ -4,8 +4,10 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, MailCheck } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useDict } from '@/contexts/LanguageContext'
 
 export default function ForgotPasswordPage() {
+    const { auth: t } = useDict()
     const [email, setEmail] = useState('')
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
@@ -23,7 +25,7 @@ export default function ForgotPasswordPage() {
             if (error) throw error
             setSent(true)
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Не удалось отправить письмо')
+            setError(err instanceof Error ? err.message : t.forgotErr)
         } finally {
             setLoading(false)
         }
@@ -38,7 +40,7 @@ export default function ForgotPasswordPage() {
                     className="inline-flex items-center gap-1.5 text-[14px] text-[#6b6b6b] hover:text-[#f0ece4] mb-10 transition-colors"
                 >
                     <ArrowLeft size={16} />
-                    Назад ко входу
+                    {t.backToLogin}
                 </Link>
 
                 {sent ? (
@@ -47,27 +49,26 @@ export default function ForgotPasswordPage() {
                             <MailCheck size={26} className="text-[#34c759]" />
                         </div>
                         <h1 className="text-[24px] font-bold tracking-[-0.04em] mb-2 text-[#f0ece4]">
-                            Письмо отправлено
+                            {t.sentTitle}
                         </h1>
                         <p className="text-[15px] text-[#6b6b6b] leading-relaxed">
-                            Если аккаунт с адресом <span className="text-[#f0ece4]">{email}</span> существует,
-                            мы отправили на него ссылку для сброса пароля.
+                            {t.sentSub1} <span className="text-[#f0ece4]">{email}</span> {t.sentSub2}
                         </p>
                     </div>
                 ) : (
                     <>
                         <div className="mb-8">
                             <h1 className="text-[28px] font-bold tracking-[-0.04em] mb-2 text-[#f0ece4]">
-                                Сброс пароля
+                                {t.forgotTitle}
                             </h1>
                             <p className="text-[#6b6b6b] text-[15px]">
-                                Укажите email — мы пришлём ссылку для восстановления доступа.
+                                {t.forgotSub}
                             </p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                             <div className="flex flex-col gap-1.5">
-                                <label className="text-[13px] font-medium text-[#6b6b6b]">Email</label>
+                                <label className="text-[13px] font-medium text-[#6b6b6b]">{t.email}</label>
                                 <input
                                     type="email"
                                     value={email}
@@ -93,7 +94,7 @@ export default function ForgotPasswordPage() {
                                 {loading && (
                                     <span className="w-4 h-4 border-2 border-[#0a0a0a]/30 border-t-[#0a0a0a] rounded-full animate-spin" />
                                 )}
-                                {loading ? 'Отправка...' : 'Отправить ссылку'}
+                                {loading ? t.sending : t.sendLink}
                             </button>
                         </form>
                     </>

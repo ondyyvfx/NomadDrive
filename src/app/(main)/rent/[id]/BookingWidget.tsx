@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronRight, Info } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useDict } from '@/contexts/LanguageContext'
 import type { CarForRent } from '@/types'
 import type { User } from '@supabase/supabase-js'
 
@@ -14,6 +15,7 @@ interface Props {
 
 export function BookingWidget({ car, user }: Props) {
     const router = useRouter()
+    const { detail: t, common } = useDict()
     const [startDate, setStartDate] = useState('')
     const [endDate, setEndDate] = useState('')
     const [loading, setLoading] = useState(false)
@@ -55,18 +57,18 @@ export function BookingWidget({ car, user }: Props) {
                 .eq('is_active', true)
                 .single()
 
-            if (error || !data) throw new Error('Промокод не найден')
+            if (error || !data) throw new Error(t.promoNotFound)
 
             if (data.expires_at && new Date(data.expires_at) < new Date()) {
-                throw new Error('Промокод истёк')
+                throw new Error(t.promoExpired)
             }
             if (data.max_uses && data.used_count >= data.max_uses) {
-                throw new Error('Промокод исчерпан')
+                throw new Error(t.promoUsedUp)
             }
 
             setPromoApplied({ discount: data.value, type: data.type })
         } catch (err: unknown) {
-            setPromoError(err instanceof Error ? err.message : 'Ошибка')
+            setPromoError(err instanceof Error ? err.message : t.error)
         } finally {
             setPromoLoading(false)
         }
@@ -79,12 +81,12 @@ export function BookingWidget({ car, user }: Props) {
         }
 
         if (!startDate || !endDate) {
-            setError('Выберите даты аренды')
+            setError(t.selectDates)
             return
         }
 
         if (days < 1) {
-            setError('Минимальный срок аренды — 1 день')
+            setError(t.minTerm)
             return
         }
 
@@ -110,7 +112,7 @@ export function BookingWidget({ car, user }: Props) {
             if (error) throw error
             router.push(`/dashboard/bookings/${data.id}`)
         } catch (err: unknown) {
-            setError(err instanceof Error ? err.message : 'Ошибка бронирования')
+            setError(err instanceof Error ? err.message : t.bookingError)
         } finally {
             setLoading(false)
         }
@@ -126,13 +128,13 @@ export function BookingWidget({ car, user }: Props) {
                 <div className="flex items-baseline justify-between">
                     <div>
                         <span className="text-[26px] font-bold tracking-tight text-[#f0ece4]">
-                            {car.price_per_day.toLocaleString('ru-RU')} ₸
+                            {car.price_per_day.toLocaleString(common.locale)} ₸
                         </span>
-                        <span className="text-[14px] text-[#6b6b6b] ml-1">/ день</span>
+                        <span className="text-[14px] text-[#6b6b6b] ml-1">{t.perDay}</span>
                     </div>
                     {days > 0 && (
                         <span className="text-[13px] text-[#6b6b6b]">
-                            {days} {days === 1 ? 'день' : days < 5 ? 'дня' : 'дней'}
+                            {days} {days === 1 ? t.dayOne : days < 5 ? t.dayFew : t.dayMany}
                         </span>
                     )}
                 </div>
@@ -142,10 +144,10 @@ export function BookingWidget({ car, user }: Props) {
 
                 {/* Даты */}
                 <div>
-                    <p className="text-[13px] font-medium text-[#6b6b6b] mb-2">Даты аренды</p>
+                    <p className="text-[13px] font-medium text-[#6b6b6b] mb-2">{t.rentDates}</p>
                     <div className="grid grid-cols-2 gap-2">
                         <div className="flex flex-col gap-1">
-                            <label className="text-[11px] text-[#3d3d3d] uppercase tracking-wide">Заезд</label>
+                            <label className="text-[11px] text-[#3d3d3d] uppercase tracking-wide">{t.checkIn}</label>
                             <input
                                 type="date"
                                 value={startDate}
@@ -159,7 +161,7 @@ export function BookingWidget({ car, user }: Props) {
                             />
                         </div>
                         <div className="flex flex-col gap-1">
-                            <label className="text-[11px] text-[#3d3d3d] uppercase tracking-wide">Выезд</label>
+                            <label className="text-[11px] text-[#3d3d3d] uppercase tracking-wide">{t.checkOut}</label>
                             <input
                                 type="date"
                                 value={endDate}
@@ -174,7 +176,7 @@ export function BookingWidget({ car, user }: Props) {
                 {/* Промокод */}
                 {days > 0 && (
                     <div className="fade-in">
-                        <p className="text-[13px] font-medium text-[#6b6b6b] mb-2">Промокод</p>
+                        <p className="text-[13px] font-medium text-[#6b6b6b] mb-2">{t.promo}</p>
                         <div className="flex gap-2">
                             <input
                                 type="text"
@@ -192,7 +194,7 @@ export function BookingWidget({ car, user }: Props) {
                                 disabled={promoLoading || !promoCode.trim()}
                                 className="h-10 px-4 bg-[#1a1a1a] border border-white/[0.08] rounded-[10px] text-[13px] font-medium text-[#f0ece4] hover:bg-white/[0.04] transition-colors disabled:opacity-40"
                             >
-                                {promoLoading ? '...' : 'Применить'}
+                                {promoLoading ? '...' : t.apply}
                             </button>
                         </div>
                         {promoError && (
@@ -200,10 +202,10 @@ export function BookingWidget({ car, user }: Props) {
                         )}
                         {promoApplied && (
                             <p className="text-[12px] text-[#34c759] mt-1.5 flex items-center gap-1">
-                                ✓ Промокод применён — скидка{' '}
+                                ✓ {t.promoApplied}{' '}
                                 {promoApplied.type === 'percent'
                                     ? `${promoApplied.discount}%`
-                                    : `${promoApplied.discount.toLocaleString('ru-RU')} ₸`}
+                                    : `${promoApplied.discount.toLocaleString(common.locale)} ₸`}
                             </p>
                         )}
                     </div>
@@ -214,23 +216,23 @@ export function BookingWidget({ car, user }: Props) {
                     <div className="bg-[#161616] border border-white/[0.06] rounded-[12px] p-4 flex flex-col gap-2 fade-in">
                         <div className="flex justify-between text-[14px]">
                             <span className="text-[#6b6b6b]">
-                                {car.price_per_day.toLocaleString('ru-RU')} ₸ × {days} дн.
+                                {car.price_per_day.toLocaleString(common.locale)} ₸ × {days} {t.days}
                             </span>
-                            <span className="font-medium text-[#f0ece4]">{basePrice.toLocaleString('ru-RU')} ₸</span>
+                            <span className="font-medium text-[#f0ece4]">{basePrice.toLocaleString(common.locale)} ₸</span>
                         </div>
                         {discount > 0 && (
                             <div className="flex justify-between text-[14px]">
-                                <span className="text-[#6b6b6b]">Скидка</span>
+                                <span className="text-[#6b6b6b]">{t.discount}</span>
                                 <span className="text-[#34c759] font-medium">
-                                    −{discount.toLocaleString('ru-RU')} ₸
+                                    −{discount.toLocaleString(common.locale)} ₸
                                 </span>
                             </div>
                         )}
                         <div className="h-px bg-white/[0.06] my-1" />
                         <div className="flex justify-between">
-                            <span className="text-[15px] font-bold text-[#f0ece4]">Итого</span>
+                            <span className="text-[15px] font-bold text-[#f0ece4]">{t.total}</span>
                             <span className="text-[15px] font-bold text-[#c9a96e]">
-                                {totalPrice.toLocaleString('ru-RU')} ₸
+                                {totalPrice.toLocaleString(common.locale)} ₸
                             </span>
                         </div>
                     </div>
@@ -255,10 +257,10 @@ export function BookingWidget({ car, user }: Props) {
                     ) : (
                         <>
                             {!isAvailable
-                                ? 'Недоступен'
+                                ? t.unavailable
                                 : !user
-                                    ? 'Войти и забронировать'
-                                    : 'Забронировать'}
+                                    ? t.loginAndBook
+                                    : t.book}
                             {isAvailable && <ChevronRight size={16} />}
                         </>
                     )}
@@ -266,7 +268,7 @@ export function BookingWidget({ car, user }: Props) {
 
                 {/* Note */}
                 <p className="text-[12px] text-[#3d3d3d] text-center leading-relaxed">
-                    Бесплатная отмена за 24 часа до начала аренды
+                    {t.cancelNote}
                 </p>
 
             </div>

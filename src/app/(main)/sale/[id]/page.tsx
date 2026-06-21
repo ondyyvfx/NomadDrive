@@ -6,34 +6,37 @@ import {
     Calendar, Shield, CheckCircle2, Phone, MessageCircle
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-
-const transmissionLabel: Record<string, string> = {
-    auto: 'Автомат', manual: 'Механика',
-}
-const fuelLabel: Record<string, string> = {
-    petrol: 'Бензин', diesel: 'Дизель', electric: 'Электро', hybrid: 'Гибрид',
-}
-const statusConfig: Record<string, { label: string; classes: string }> = {
-    available: { label: 'В наличии', classes: 'text-[#34c759]' },
-    sold: { label: 'Продан', classes: 'text-[#ff3b30]' },
-    reserved: { label: 'Резерв', classes: 'text-[#ff9f0a]' },
-}
+import { getServerDict } from '@/lib/i18n.server'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
     const supabase = await createClient()
+    const { saleDetail: t } = await getServerDict()
     const { data: car } = await supabase
         .from('cars_for_sale')
         .select('brand, model, year')
         .eq('id', id)
         .single()
-    if (!car) return { title: 'Не найдено' }
-    return { title: `${car.brand} ${car.model} ${car.year} — Продажа` }
+    if (!car) return { title: t.notFound }
+    return { title: `${car.brand} ${car.model} ${car.year} — ${t.saleSuffix}` }
 }
 
 export default async function SaleCarPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
     const supabase = await createClient()
+    const { saleDetail: t, sale: s, common } = await getServerDict()
+
+    const transmissionLabel: Record<string, string> = {
+        auto: s.auto, manual: s.manual,
+    }
+    const fuelLabel: Record<string, string> = {
+        petrol: s.petrol, diesel: s.diesel, electric: s.electric, hybrid: s.hybrid,
+    }
+    const statusConfig: Record<string, { label: string; classes: string }> = {
+        available: { label: s.statusAvailable, classes: 'text-[#34c759]' },
+        sold: { label: s.statusSold, classes: 'text-[#ff3b30]' },
+        reserved: { label: s.statusReserved, classes: 'text-[#ff9f0a]' },
+    }
 
     const { data: car } = await supabase
         .from('cars_for_sale')
@@ -54,12 +57,12 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
     const images = car.image_urls ?? []
 
     const specs = [
-        { icon: Calendar, label: 'Год выпуска', value: String(car.year) },
-        { icon: Gauge, label: 'Пробег', value: `${car.mileage.toLocaleString('ru-RU')} км` },
-        { icon: Settings2, label: 'Коробка', value: car.transmission ? transmissionLabel[car.transmission] : '—' },
-        { icon: Fuel, label: 'Топливо', value: car.fuel_type ? fuelLabel[car.fuel_type] : '—' },
-        ...(car.engine_volume ? [{ icon: Fuel, label: 'Объём', value: `${car.engine_volume}L` }] : []),
-        ...(car.location ? [{ icon: MapPin, label: 'Город', value: car.location }] : []),
+        { icon: Calendar, label: t.specYear, value: String(car.year) },
+        { icon: Gauge, label: t.specMileage, value: `${car.mileage.toLocaleString(common.locale)} ${s.kmSuffix}` },
+        { icon: Settings2, label: t.specTransmission, value: car.transmission ? transmissionLabel[car.transmission] : '—' },
+        { icon: Fuel, label: t.specFuel, value: car.fuel_type ? fuelLabel[car.fuel_type] : '—' },
+        ...(car.engine_volume ? [{ icon: Fuel, label: t.specVolume, value: `${car.engine_volume}L` }] : []),
+        ...(car.location ? [{ icon: MapPin, label: t.specCity, value: car.location }] : []),
     ]
 
     return (
@@ -72,7 +75,7 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
                     className="inline-flex items-center gap-1.5 text-[14px] text-[#6b6b6b] hover:text-[#f0ece4] transition-colors"
                 >
                     <ChevronLeft size={16} />
-                    Продажа авто
+                    {t.catalog}
                 </Link>
                 <span className="text-[#3d3d3d]">/</span>
                 <span className="text-[14px] text-[#f0ece4]">{car.brand} {car.model}</span>
@@ -131,7 +134,7 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
 
                     {/* Характеристики */}
                     <div className="bg-[#111111] border border-white/[0.07] rounded-[14px] p-5 fade-in-up">
-                        <h2 className="text-[16px] font-bold tracking-tight mb-4 text-[#f0ece4]">Характеристики</h2>
+                        <h2 className="text-[16px] font-bold tracking-tight mb-4 text-[#f0ece4]">{t.specs}</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                             {specs.map(({ icon: Icon, label, value }) => (
                                 <div key={label} className="flex flex-col gap-1.5">
@@ -148,7 +151,7 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
                     {/* Описание */}
                     {car.description && (
                         <div className="fade-in-up">
-                            <h2 className="text-[16px] font-bold tracking-tight mb-3 text-[#f0ece4]">Описание</h2>
+                            <h2 className="text-[16px] font-bold tracking-tight mb-3 text-[#f0ece4]">{t.description}</h2>
                             <p className="text-[15px] text-[#6b6b6b] leading-relaxed">{car.description}</p>
                         </div>
                     )}
@@ -156,10 +159,10 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
                     {/* Гарантии */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 fade-in-up">
                         {[
-                            { icon: Shield, text: 'Юридическая чистота проверена' },
-                            { icon: CheckCircle2, text: 'Без скрытых дефектов' },
-                            { icon: CheckCircle2, text: 'Полная история обслуживания' },
-                            { icon: Shield, text: 'Безопасная сделка' },
+                            { icon: Shield, text: t.guaranteeLegal },
+                            { icon: CheckCircle2, text: t.guaranteeNoDefects },
+                            { icon: CheckCircle2, text: t.guaranteeHistory },
+                            { icon: Shield, text: t.guaranteeSafe },
                         ].map(({ icon: Icon, text }) => (
                             <div key={text} className="flex items-center gap-3 p-4 bg-[#111111] border border-white/[0.07] rounded-[12px]">
                                 <Icon size={16} className="text-[#c9a96e] flex-shrink-0" />
@@ -176,10 +179,10 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
 
                         <div className="px-6 pt-6 pb-5 border-b border-white/[0.06]">
                             <p className="text-[28px] font-bold tracking-tight text-[#f0ece4]">
-                                {car.price.toLocaleString('ru-RU')} ₸
+                                {car.price.toLocaleString(common.locale)} ₸
                             </p>
                             <p className="text-[13px] text-[#6b6b6b] mt-0.5">
-                                ≈ {Math.round(car.price / 450).toLocaleString('ru-RU')} $
+                                ≈ {Math.round(car.price / 450).toLocaleString(common.locale)} $
                             </p>
                         </div>
 
@@ -188,9 +191,9 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
                             {/* Быстрые факты */}
                             <div className="grid grid-cols-3 gap-2 mb-2">
                                 {[
-                                    { label: 'Год', value: String(car.year) },
-                                    { label: 'Пробег', value: `${(car.mileage / 1000).toFixed(0)}к` },
-                                    { label: 'КПП', value: car.transmission === 'auto' ? 'Авт.' : 'Мех.' },
+                                    { label: t.factYear, value: String(car.year) },
+                                    { label: t.factMileage, value: `${(car.mileage / 1000).toFixed(0)}к` },
+                                    { label: t.factTransmission, value: car.transmission === 'auto' ? t.transAuto : t.transManual },
                                 ].map(({ label, value }) => (
                                     <div key={label} className="text-center p-2 bg-[#161616] rounded-[10px] border border-white/[0.05]">
                                         <p className="text-[13px] font-bold text-[#f0ece4]">{value}</p>
@@ -205,7 +208,7 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
                                     className="w-full h-12 font-bold rounded-[12px] transition-all duration-300 flex items-center justify-center gap-2 text-[15px] bg-[#c9a96e] text-[#0a0a0a] hover:bg-[#d4b87a]"
                                 >
                                     <Phone size={16} />
-                                    Связаться с продавцом
+                                    {t.contactSeller}
                                 </a>
                             ) : (
                                 <button
@@ -218,17 +221,17 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
                             )}
 
                             <a
-                                href={`https://wa.me/77007007000?text=${encodeURIComponent(`Здравствуйте! Интересует ${car.brand} ${car.model} ${car.year} за ${car.price.toLocaleString('ru-RU')} ₸`)}`}
+                                href={`https://wa.me/77007007000?text=${encodeURIComponent(`${t.whatsappMsg1} ${car.brand} ${car.model} ${car.year} ${t.whatsappMsg2} ${car.price.toLocaleString(common.locale)} ₸`)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-full h-12 bg-[#1a1a1a] text-[#f0ece4] font-medium rounded-[12px] border border-white/[0.08] hover:bg-white/[0.04] transition-colors text-[15px] flex items-center justify-center gap-2"
                             >
                                 <MessageCircle size={16} />
-                                Написать в WhatsApp
+                                {t.writeWhatsapp}
                             </a>
 
                             <p className="text-[12px] text-[#3d3d3d] text-center">
-                                Безопасная сделка через платформу NomadDrive · +7 700 700 70 00
+                                {t.safeDeal}
                             </p>
                         </div>
                     </div>
@@ -240,19 +243,19 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
             {similar && similar.length > 0 && (
                 <div className="mt-16 fade-in-up">
                     <h2 className="text-[20px] font-bold tracking-tight mb-6 text-[#f0ece4]">
-                        Другие {car.brand}
+                        {t.otherOf} {car.brand}
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 stagger-children">
-                        {similar.map(s => (
+                        {similar.map(sc => (
                             <Link
-                                key={s.id}
-                                href={`/sale/${s.id}`}
+                                key={sc.id}
+                                href={`/sale/${sc.id}`}
                                 className="group bg-[#111111] border border-white/[0.07] rounded-[14px] overflow-hidden hover:shadow-lg hover:-translate-y-1 hover:border-white/[0.12] transition-all duration-300"
                             >
                                 <div className="relative h-40 bg-[#161616]">
-                                    {s.image_urls?.[0] ? (
+                                    {sc.image_urls?.[0] ? (
                                         <Image
-                                            src={s.image_urls[0]} alt={`${s.brand} ${s.model}`}
+                                            src={sc.image_urls[0]} alt={`${sc.brand} ${sc.model}`}
                                             fill sizes="33vw"
                                             className="object-cover group-hover:scale-105 transition-transform duration-700"
                                         />
@@ -261,12 +264,12 @@ export default async function SaleCarPage({ params }: { params: Promise<{ id: st
                                     )}
                                 </div>
                                 <div className="p-4">
-                                    <p className="font-bold text-[15px] tracking-tight text-[#f0ece4]">{s.brand} {s.model}</p>
+                                    <p className="font-bold text-[15px] tracking-tight text-[#f0ece4]">{sc.brand} {sc.model}</p>
                                     <p className="text-[13px] text-[#6b6b6b] mt-0.5">
-                                        {s.year} · {s.mileage.toLocaleString('ru-RU')} км
+                                        {sc.year} · {sc.mileage.toLocaleString(common.locale)} {s.kmSuffix}
                                     </p>
                                     <p className="text-[15px] font-bold text-[#c9a96e] mt-2">
-                                        {s.price.toLocaleString('ru-RU')} ₸
+                                        {sc.price.toLocaleString(common.locale)} ₸
                                     </p>
                                 </div>
                             </Link>

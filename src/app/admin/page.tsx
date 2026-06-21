@@ -1,14 +1,19 @@
 import { createClient } from '@/lib/supabase/server'
+import { getServerDict } from '@/lib/i18n.server'
 import {
     Car, ShoppingBag, Wrench,
     Calendar, Package
 } from 'lucide-react'
 import Link from 'next/link'
 
-export const metadata = { title: 'Admin — Обзор' }
+export async function generateMetadata() {
+    const { admin: t } = await getServerDict()
+    return { title: `Admin — ${t.overview}` }
+}
 
 export default async function AdminPage() {
     const supabase = await createClient()
+    const { admin: t, common } = await getServerDict()
 
     const [
         { count: carsRentCount },
@@ -37,11 +42,11 @@ export default async function AdminPage() {
     ])
 
     const stats = [
-        { label: 'Авто в аренде', value: carsRentCount ?? 0, icon: Car, href: '/admin/cars', color: 'text-[#c9a96e] bg-[#c9a96e]/[0.07]' },
-        { label: 'Авто на продажу', value: carsSaleCount ?? 0, icon: ShoppingBag, href: '/admin/sale', color: 'text-[#b8860b] bg-[#b8860b]/[0.07]' },
-        { label: 'Запчасти', value: partsCount ?? 0, icon: Wrench, href: '/admin/parts', color: 'text-[#8b6f47] bg-[#8b6f47]/[0.07]' },
-        { label: 'Бронирований', value: bookingsCount ?? 0, icon: Calendar, href: '/admin/bookings', color: 'text-[#5856d6] bg-[#5856d6]/[0.07]' },
-        { label: 'Заказов', value: ordersCount ?? 0, icon: Package, href: '/admin/orders', color: 'text-[#ff9f0a] bg-[#ff9f0a]/[0.07]' },
+        { label: t.statCarsRent, value: carsRentCount ?? 0, icon: Car, href: '/admin/cars', color: 'text-[#c9a96e] bg-[#c9a96e]/[0.07]' },
+        { label: t.statCarsSale, value: carsSaleCount ?? 0, icon: ShoppingBag, href: '/admin/sale', color: 'text-[#b8860b] bg-[#b8860b]/[0.07]' },
+        { label: t.statParts, value: partsCount ?? 0, icon: Wrench, href: '/admin/parts', color: 'text-[#8b6f47] bg-[#8b6f47]/[0.07]' },
+        { label: t.statBookings, value: bookingsCount ?? 0, icon: Calendar, href: '/admin/bookings', color: 'text-[#5856d6] bg-[#5856d6]/[0.07]' },
+        { label: t.statOrders, value: ordersCount ?? 0, icon: Package, href: '/admin/orders', color: 'text-[#ff9f0a] bg-[#ff9f0a]/[0.07]' },
     ]
 
     const statusColors: Record<string, string> = {
@@ -55,22 +60,22 @@ export default async function AdminPage() {
     }
 
     const statusLabels: Record<string, string> = {
-        pending: 'Ожидает',
-        confirmed: 'Подтверждён',
-        active: 'Активна',
-        completed: 'Завершён',
-        cancelled: 'Отменён',
-        delivered: 'Доставлен',
-        shipped: 'В доставке',
+        pending: t.stPending,
+        confirmed: t.stConfirmed,
+        active: t.stActive,
+        completed: t.stCompleted,
+        cancelled: t.stCancelled,
+        delivered: t.stDelivered,
+        shipped: t.stShipped,
     }
 
     return (
         <div className="max-w-[1000px]">
 
             <div className="mb-8 fade-in">
-                <h1 className="text-2xl font-bold tracking-[-0.04em] mb-1 text-[#f0ece4]">Обзор</h1>
+                <h1 className="text-2xl font-bold tracking-[-0.04em] mb-1 text-[#f0ece4]">{t.overview}</h1>
                 <p className="text-[14px] text-[#6b6b6b]">
-                    {new Date().toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' })}
+                    {new Date().toLocaleDateString(common.locale, { weekday: 'long', day: 'numeric', month: 'long' })}
                 </p>
             </div>
 
@@ -94,9 +99,9 @@ export default async function AdminPage() {
 
                 <div className="bg-[#111111] border border-white/[0.07] rounded-[16px] overflow-hidden fade-in-up">
                     <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
-                        <h2 className="text-[15px] font-bold tracking-tight text-[#f0ece4]">Последние брони</h2>
+                        <h2 className="text-[15px] font-bold tracking-tight text-[#f0ece4]">{t.recentBookings}</h2>
                         <Link href="/admin/bookings" className="text-[13px] text-[#c9a96e] hover:underline">
-                            Все →
+                            {t.all}
                         </Link>
                     </div>
                     <div className="divide-y divide-white/[0.05]">
@@ -110,10 +115,10 @@ export default async function AdminPage() {
                                 >
                                     <div>
                                         <p className="text-[13px] font-medium text-[#f0ece4]">
-                                            {car ? `${car.brand} ${car.model}` : 'Авто'}
+                                            {car ? `${car.brand} ${car.model}` : t.carFallback}
                                         </p>
                                         <p className="text-[11px] text-[#3d3d3d]">
-                                            {new Date(b.created_at).toLocaleDateString('ru-RU')}
+                                            {new Date(b.created_at).toLocaleDateString(common.locale)}
                                         </p>
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -121,22 +126,22 @@ export default async function AdminPage() {
                                             {statusLabels[b.status]}
                                         </span>
                                         <span className="text-[13px] font-semibold text-[#f0ece4]">
-                                            {b.total_price.toLocaleString('ru-RU')} ₸
+                                            {b.total_price.toLocaleString(common.locale)} ₸
                                         </span>
                                     </div>
                                 </Link>
                             )
                         }) : (
-                            <p className="px-5 py-8 text-center text-[13px] text-[#3d3d3d]">Нет бронирований</p>
+                            <p className="px-5 py-8 text-center text-[13px] text-[#3d3d3d]">{t.noBookings}</p>
                         )}
                     </div>
                 </div>
 
                 <div className="bg-[#111111] border border-white/[0.07] rounded-[16px] overflow-hidden fade-in-up">
                     <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
-                        <h2 className="text-[15px] font-bold tracking-tight text-[#f0ece4]">Последние заказы</h2>
+                        <h2 className="text-[15px] font-bold tracking-tight text-[#f0ece4]">{t.recentOrders}</h2>
                         <Link href="/admin/orders" className="text-[13px] text-[#c9a96e] hover:underline">
-                            Все →
+                            {t.all}
                         </Link>
                     </div>
                     <div className="divide-y divide-white/[0.05]">
@@ -151,7 +156,7 @@ export default async function AdminPage() {
                                         #{o.id.slice(0, 8).toUpperCase()}
                                     </p>
                                     <p className="text-[11px] text-[#3d3d3d]">
-                                        {new Date(o.created_at).toLocaleDateString('ru-RU')}
+                                        {new Date(o.created_at).toLocaleDateString(common.locale)}
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -159,12 +164,12 @@ export default async function AdminPage() {
                                         {statusLabels[o.status]}
                                     </span>
                                     <span className="text-[13px] font-semibold text-[#f0ece4]">
-                                        {o.total.toLocaleString('ru-RU')} ₸
+                                        {o.total.toLocaleString(common.locale)} ₸
                                     </span>
                                 </div>
                             </Link>
                         )) : (
-                            <p className="px-5 py-8 text-center text-[13px] text-[#3d3d3d]">Нет заказов</p>
+                            <p className="px-5 py-8 text-center text-[13px] text-[#3d3d3d]">{t.noOrders}</p>
                         )}
                     </div>
                 </div>

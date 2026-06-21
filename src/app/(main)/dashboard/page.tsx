@@ -1,15 +1,20 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { getServerDict } from '@/lib/i18n.server'
 import {
     Calendar, ShoppingBag, User,
     ChevronRight, Clock, CheckCircle2, XCircle
 } from 'lucide-react'
 
-export const metadata = { title: 'Личный кабинет' }
+export async function generateMetadata() {
+    const { dash: t } = await getServerDict()
+    return { title: t.title }
+}
 
 export default async function DashboardPage() {
     const supabase = await createClient()
+    const { dash: t, common } = await getServerDict()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) redirect('/login?redirect=/dashboard')
 
@@ -47,12 +52,12 @@ export default async function DashboardPage() {
     }
 
     const statusConfig: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-        pending: { label: 'Ожидает', icon: <Clock size={13} />, color: 'text-[#ff9f0a] bg-[#ff9f0a]/[0.08]' },
-        confirmed: { label: 'Подтверждён', icon: <CheckCircle2 size={13} />, color: 'text-[#34c759] bg-[#34c759]/[0.08]' },
-        active: { label: 'Активна', icon: <CheckCircle2 size={13} />, color: 'text-[#34c759] bg-[#34c759]/[0.08]' },
-        completed: { label: 'Завершён', icon: <CheckCircle2 size={13} />, color: 'text-[#6b6b6b] bg-white/[0.05]' },
-        cancelled: { label: 'Отменён', icon: <XCircle size={13} />, color: 'text-[#ff3b30] bg-[#ff3b30]/[0.08]' },
-        delivered: { label: 'Доставлен', icon: <CheckCircle2 size={13} />, color: 'text-[#34c759] bg-[#34c759]/[0.08]' },
+        pending: { label: t.stPending, icon: <Clock size={13} />, color: 'text-[#ff9f0a] bg-[#ff9f0a]/[0.08]' },
+        confirmed: { label: t.stConfirmedM, icon: <CheckCircle2 size={13} />, color: 'text-[#34c759] bg-[#34c759]/[0.08]' },
+        active: { label: t.stActive, icon: <CheckCircle2 size={13} />, color: 'text-[#34c759] bg-[#34c759]/[0.08]' },
+        completed: { label: t.stCompletedM, icon: <CheckCircle2 size={13} />, color: 'text-[#6b6b6b] bg-white/[0.05]' },
+        cancelled: { label: t.stCancelledM, icon: <XCircle size={13} />, color: 'text-[#ff3b30] bg-[#ff3b30]/[0.08]' },
+        delivered: { label: t.stDelivered, icon: <CheckCircle2 size={13} />, color: 'text-[#34c759] bg-[#34c759]/[0.08]' },
     }
 
     return (
@@ -60,7 +65,7 @@ export default async function DashboardPage() {
 
             <div className="mb-10 fade-in">
                 <h1 className="text-2xl md:text-3xl font-bold tracking-[-0.04em] mb-1 text-[#f0ece4]">
-                    Привет, {firstName} 👋
+                    {t.greeting} {firstName} 👋
                 </h1>
                 <p className="text-[#6b6b6b] text-[15px]">{user.email}</p>
             </div>
@@ -70,25 +75,25 @@ export default async function DashboardPage() {
                     {
                         href: '/dashboard/bookings',
                         icon: Calendar,
-                        label: 'Мои бронирования',
+                        label: t.cardBookings,
                         value: bookingStats.total,
-                        sub: bookingStats.active > 0 ? `${bookingStats.active} активных` : 'Нет активных',
+                        sub: bookingStats.active > 0 ? `${bookingStats.active} ${t.activeCount}` : t.noActive,
                         color: 'text-[#c9a96e] bg-[#c9a96e]/[0.07]',
                     },
                     {
                         href: '/dashboard/orders',
                         icon: ShoppingBag,
-                        label: 'Мои заказы',
+                        label: t.cardOrders,
                         value: orderStats.total,
-                        sub: orderStats.pending > 0 ? `${orderStats.pending} в обработке` : 'Нет новых',
+                        sub: orderStats.pending > 0 ? `${orderStats.pending} ${t.processingCount}` : t.noNew,
                         color: 'text-[#b8860b] bg-[#b8860b]/[0.07]',
                     },
                     {
                         href: '/dashboard/profile',
                         icon: User,
-                        label: 'Профиль',
+                        label: t.cardProfile,
                         value: null,
-                        sub: profile?.full_name ?? 'Заполнить профиль',
+                        sub: profile?.full_name ?? t.fillProfile,
                         color: 'text-[#8b6f47] bg-[#8b6f47]/[0.07]',
                     },
                 ].map(({ href, icon: Icon, label, value, sub, color }) => (
@@ -118,13 +123,13 @@ export default async function DashboardPage() {
                 <div className="mb-8 fade-in-up">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-[18px] font-bold tracking-tight text-[#f0ece4]">
-                            Последние бронирования
+                            {t.recentBookings}
                         </h2>
                         <Link
                             href="/dashboard/bookings"
                             className="text-[14px] text-[#c9a96e] hover:underline"
                         >
-                            Все →
+                            {t.all}
                         </Link>
                     </div>
                     <div className="flex flex-col gap-3">
@@ -143,7 +148,7 @@ export default async function DashboardPage() {
                                         </div>
                                         <div>
                                             <p className="text-[15px] font-semibold tracking-tight text-[#f0ece4]">
-                                                {car ? `${car.brand} ${car.model}` : 'Автомобиль'}
+                                                {car ? `${car.brand} ${car.model}` : t.carFallback}
                                             </p>
                                             <p className="text-[12px] text-[#6b6b6b]">
                                                 {b.start_date} — {b.end_date}
@@ -156,7 +161,7 @@ export default async function DashboardPage() {
                                             {s.label}
                                         </span>
                                         <p className="text-[14px] font-semibold hidden sm:block text-[#f0ece4]">
-                                            {b.total_price.toLocaleString('ru-RU')} ₸
+                                            {b.total_price.toLocaleString(common.locale)} ₸
                                         </p>
                                         <ChevronRight size={16} className="text-[#3d3d3d] group-hover:text-[#f0ece4] transition-colors" />
                                     </div>
@@ -171,13 +176,13 @@ export default async function DashboardPage() {
                 <div className="fade-in-up">
                     <div className="flex items-center justify-between mb-4">
                         <h2 className="text-[18px] font-bold tracking-tight text-[#f0ece4]">
-                            Последние заказы
+                            {t.recentOrders}
                         </h2>
                         <Link
                             href="/dashboard/orders"
                             className="text-[14px] text-[#c9a96e] hover:underline"
                         >
-                            Все →
+                            {t.all}
                         </Link>
                     </div>
                     <div className="flex flex-col gap-3">
@@ -195,10 +200,10 @@ export default async function DashboardPage() {
                                         </div>
                                         <div>
                                             <p className="text-[15px] font-semibold tracking-tight text-[#f0ece4]">
-                                                Заказ #{o.id.slice(0, 8).toUpperCase()}
+                                                {t.orderNo} #{o.id.slice(0, 8).toUpperCase()}
                                             </p>
                                             <p className="text-[12px] text-[#6b6b6b]">
-                                                {new Date(o.created_at).toLocaleDateString('ru-RU')}
+                                                {new Date(o.created_at).toLocaleDateString(common.locale)}
                                             </p>
                                         </div>
                                     </div>
@@ -208,7 +213,7 @@ export default async function DashboardPage() {
                                             {s.label}
                                         </span>
                                         <p className="text-[14px] font-semibold hidden sm:block text-[#f0ece4]">
-                                            {o.total.toLocaleString('ru-RU')} ₸
+                                            {o.total.toLocaleString(common.locale)} ₸
                                         </p>
                                         <ChevronRight size={16} className="text-[#3d3d3d] group-hover:text-[#f0ece4] transition-colors" />
                                     </div>
