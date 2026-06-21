@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/contexts/LanguageContext'
 
 /* ─── Translations ─── */
@@ -12,15 +13,24 @@ const T = {
         hero_title_em: 'И ты',
         hero_title_2: 'тоже.',
         hero_sub: 'Найди авто за 30 секунд, выставь своё за 2 минуты или закажи нужную запчасть — всё на одной платформе. Каждый километр — твой.',
-        search_pickup: 'Откуда',
-        search_pickup_val: 'Алматы, Медеу',
-        search_from: 'Дата выезда',
-        search_from_val: 'Пт, 23 мая',
-        search_return: 'Дата возврата',
-        search_return_val: 'Пн, 26 мая',
-        search_class: 'Класс',
-        search_class_val: 'Premium SUV',
+        search_city: 'Город',
+        search_city_any: 'Любой город',
+        search_brand: 'Марка',
+        search_brand_any: 'Любая марка',
+        search_fuel: 'Тип топлива',
+        search_fuel_any: 'Любой',
+        search_fuel_petrol: 'Бензин',
+        search_fuel_diesel: 'Дизель',
+        search_fuel_electric: 'Электро',
+        search_fuel_hybrid: 'Гибрид',
+        search_price: 'Цена / сутки',
+        search_price_any: 'Любая',
+        search_price_1: 'до 30 000 ₸',
+        search_price_2: 'до 50 000 ₸',
+        search_price_3: 'до 80 000 ₸',
+        search_price_4: 'от 80 000 ₸',
         search_cta: 'Найти авто',
+        search_reset: 'Сбросить',
         stat_1_n: '8 400+',
         stat_1_l: 'Водителей в месяц',
         stat_2_n: '14 городов',
@@ -178,15 +188,24 @@ const T = {
         hero_title_em: 'Сен де',
         hero_title_2: 'бітпейсің.',
         hero_sub: '30 секундта автокөлік тап, 2 минутта өзіңкіні сат немесе қажетті бөлшекке тапсырыс бер — бәрі бір платформада. Әр шақырым — сеніңкі.',
-        search_pickup: 'Қайдан',
-        search_pickup_val: 'Алматы, Медеу',
-        search_from: 'Шығу күні',
-        search_from_val: 'Жм, 23 мамыр',
-        search_return: 'Қайту күні',
-        search_return_val: 'Дс, 26 мамыр',
-        search_class: 'Класс',
-        search_class_val: 'Premium SUV',
+        search_city: 'Қала',
+        search_city_any: 'Кез келген қала',
+        search_brand: 'Маркасы',
+        search_brand_any: 'Кез келген марка',
+        search_fuel: 'Отын түрі',
+        search_fuel_any: 'Кез келген',
+        search_fuel_petrol: 'Бензин',
+        search_fuel_diesel: 'Дизель',
+        search_fuel_electric: 'Электро',
+        search_fuel_hybrid: 'Гибрид',
+        search_price: 'Бағасы / тәулік',
+        search_price_any: 'Кез келген',
+        search_price_1: '30 000 ₸ дейін',
+        search_price_2: '50 000 ₸ дейін',
+        search_price_3: '80 000 ₸ дейін',
+        search_price_4: '80 000 ₸ бастап',
         search_cta: 'Автокөлік тап',
+        search_reset: 'Тазалау',
         stat_1_n: '8 400+',
         stat_1_l: 'Айына жүргізуші',
         stat_2_n: '14 қала',
@@ -356,10 +375,16 @@ interface PartRow {
     price: number; oem_number: string | null; image_urls: string[] | null
 }
 
+interface SearchMeta {
+    brands: string[]
+    cities: string[]
+}
+
 interface LandingData {
     rentCars: RentCarRow[]
     saleCars: SaleCarRow[]
     parts: PartRow[]
+    searchMeta: SearchMeta
 }
 
 const transLabel: Record<string, string> = { auto: 'автомат', manual: 'механика' }
@@ -414,52 +439,180 @@ function SeatIcon() {
 /* ─── Sections ─── */
 type T = typeof T.ru
 
-function SearchBar({ t }: { t: T }) {
+/* Опция выпадающего списка */
+interface SelectOption { value: string; label: string }
+
+/* Один селект Hero-поиска: кнопка + выпадающая панель с реальными вариантами */
+function HeroSelect({
+    label, value, options, placeholder, isOpen, onToggle, onSelect,
+}: {
+    label: string
+    value: string
+    options: SelectOption[]
+    placeholder: string
+    isOpen: boolean
+    onToggle: () => void
+    onSelect: (v: string) => void
+}) {
+    const current = options.find(o => o.value === value)
+    return (
+        <div className="relative">
+            <button
+                type="button"
+                onClick={onToggle}
+                className="w-full flex flex-col gap-1 rounded-[14px] px-4 py-3.5 text-left transition-colors"
+                style={{ background: isOpen ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.06)' }}
+                onMouseEnter={e => { if (!isOpen) e.currentTarget.style.background = 'rgba(255,255,255,0.12)' }}
+                onMouseLeave={e => { if (!isOpen) e.currentTarget.style.background = 'rgba(255,255,255,0.06)' }}
+            >
+                <span className="text-[10px] uppercase tracking-[0.14em] opacity-60" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{label}</span>
+                <span className="flex items-center justify-between gap-2 text-[14px] font-medium text-[#f2ede4]">
+                    <span className={current ? '' : 'opacity-55'}>{current ? current.label : placeholder}</span>
+                    <span className="opacity-60 transition-transform duration-200" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }}><ChevronDownIcon /></span>
+                </span>
+            </button>
+            {isOpen && (
+                <div
+                    className="absolute left-0 right-0 top-[calc(100%+8px)] z-30 rounded-[14px] p-1.5 max-h-[280px] overflow-y-auto"
+                    style={{ background: '#15151a', border: '1px solid rgba(255,255,255,0.14)', boxShadow: '0 24px 50px -12px rgba(0,0,0,0.6)' }}
+                >
+                    <button
+                        type="button"
+                        onClick={() => onSelect('')}
+                        className="w-full text-left px-3.5 py-2.5 rounded-[10px] text-[14px] transition-colors"
+                        style={{ background: value === '' ? 'rgba(201,169,110,0.18)' : 'transparent', color: value === '' ? '#c9a96e' : 'rgba(242,237,228,0.7)' }}
+                        onMouseEnter={e => { if (value !== '') e.currentTarget.style.background = 'rgba(255,255,255,0.05)' }}
+                        onMouseLeave={e => { if (value !== '') e.currentTarget.style.background = 'transparent' }}
+                    >
+                        {placeholder}
+                    </button>
+                    {options.map(o => (
+                        <button
+                            key={o.value}
+                            type="button"
+                            onClick={() => onSelect(o.value)}
+                            className="w-full text-left px-3.5 py-2.5 rounded-[10px] text-[14px] font-medium transition-colors"
+                            style={{ background: value === o.value ? 'rgba(201,169,110,0.18)' : 'transparent', color: value === o.value ? '#c9a96e' : '#f2ede4' }}
+                            onMouseEnter={e => { if (value !== o.value) e.currentTarget.style.background = 'rgba(255,255,255,0.05)' }}
+                            onMouseLeave={e => { if (value !== o.value) e.currentTarget.style.background = 'transparent' }}
+                        >
+                            {o.label}
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    )
+}
+
+function SearchBar({ t, meta }: { t: T; meta: SearchMeta }) {
+    const router = useRouter()
+    const [open, setOpen] = useState<string | null>(null)
+    const [sel, setSel] = useState({ city: '', brand: '', fuel: '', price: '' })
+    const boxRef = useRef<HTMLDivElement>(null)
+
+    // Закрытие выпадающих списков по клику вне поиска
+    useEffect(() => {
+        if (!open) return
+        function onDoc(e: MouseEvent) {
+            if (boxRef.current && !boxRef.current.contains(e.target as Node)) setOpen(null)
+        }
+        document.addEventListener('mousedown', onDoc)
+        return () => document.removeEventListener('mousedown', onDoc)
+    }, [open])
+
+    const cityOpts: SelectOption[] = meta.cities.map(c => ({ value: c, label: c }))
+    const brandOpts: SelectOption[] = meta.brands.map(b => ({ value: b, label: b }))
+    const fuelOpts: SelectOption[] = [
+        { value: 'petrol', label: t.search_fuel_petrol },
+        { value: 'diesel', label: t.search_fuel_diesel },
+        { value: 'electric', label: t.search_fuel_electric },
+        { value: 'hybrid', label: t.search_fuel_hybrid },
+    ]
+    // value кодирует диапазон цены: max:<n> или min:<n>
+    const priceOpts: SelectOption[] = [
+        { value: 'max:30000', label: t.search_price_1 },
+        { value: 'max:50000', label: t.search_price_2 },
+        { value: 'max:80000', label: t.search_price_3 },
+        { value: 'min:80000', label: t.search_price_4 },
+    ]
+
+    function pick(field: keyof typeof sel, v: string) {
+        setSel(prev => ({ ...prev, [field]: v }))
+        setOpen(null)
+    }
+
+    function runSearch() {
+        const params = new URLSearchParams()
+        if (sel.city) params.set('city', sel.city)
+        if (sel.brand) params.set('brand', sel.brand)
+        if (sel.fuel) params.set('fuel_type', sel.fuel)
+        if (sel.price) {
+            const [kind, amount] = sel.price.split(':')
+            params.set(kind === 'min' ? 'priceMin' : 'priceMax', amount)
+        }
+        const qs = params.toString()
+        router.push(qs ? `/rent?${qs}` : '/rent')
+    }
+
+    const hasSel = sel.city || sel.brand || sel.fuel || sel.price
+
     return (
         <div
-            className="grid gap-2 rounded-[22px] p-2.5 max-w-[860px]"
+            ref={boxRef}
+            className="grid gap-2 rounded-[22px] p-2.5 max-w-[920px]"
             style={{
-                gridTemplateColumns: '1.1fr 1fr 1fr 1fr auto',
+                gridTemplateColumns: '1fr 1fr 1fr 1fr auto',
                 background: 'rgba(255,255,255,0.07)',
                 backdropFilter: 'blur(20px)',
                 border: '1px solid rgba(255,255,255,0.13)',
             }}
         >
-            {([
-                { lbl: t.search_pickup, val: t.search_pickup_val },
-                { lbl: t.search_from, val: t.search_from_val },
-                { lbl: t.search_return, val: t.search_return_val },
-                { lbl: t.search_class, val: t.search_class_val },
-            ] as { lbl: string; val: string }[]).map((f) => (
-                <div
-                    key={f.lbl}
-                    className="flex flex-col gap-1 rounded-[14px] px-4 py-3.5 cursor-pointer transition-colors"
-                    style={{ background: 'rgba(255,255,255,0.06)' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
+            <HeroSelect
+                label={t.search_city} placeholder={t.search_city_any} value={sel.city} options={cityOpts}
+                isOpen={open === 'city'} onToggle={() => setOpen(open === 'city' ? null : 'city')} onSelect={v => pick('city', v)}
+            />
+            <HeroSelect
+                label={t.search_brand} placeholder={t.search_brand_any} value={sel.brand} options={brandOpts}
+                isOpen={open === 'brand'} onToggle={() => setOpen(open === 'brand' ? null : 'brand')} onSelect={v => pick('brand', v)}
+            />
+            <HeroSelect
+                label={t.search_fuel} placeholder={t.search_fuel_any} value={sel.fuel} options={fuelOpts}
+                isOpen={open === 'fuel'} onToggle={() => setOpen(open === 'fuel' ? null : 'fuel')} onSelect={v => pick('fuel', v)}
+            />
+            <HeroSelect
+                label={t.search_price} placeholder={t.search_price_any} value={sel.price} options={priceOpts}
+                isOpen={open === 'price'} onToggle={() => setOpen(open === 'price' ? null : 'price')} onSelect={v => pick('price', v)}
+            />
+            <div className="flex items-stretch gap-2">
+                {hasSel && (
+                    <button
+                        type="button"
+                        onClick={() => { setSel({ city: '', brand: '', fuel: '', price: '' }); setOpen(null) }}
+                        className="px-3 rounded-[14px] text-[13px] font-medium text-[#f2ede4]/70 hover:text-[#f2ede4] transition-colors"
+                        style={{ background: 'rgba(255,255,255,0.06)' }}
+                        aria-label={t.search_reset}
+                    >
+                        ✕
+                    </button>
+                )}
+                <button
+                    type="button"
+                    onClick={runSearch}
+                    className="rounded-[14px] px-6 flex items-center gap-3 font-semibold text-[14px] text-[#0b0b0c] transition-all duration-200 hover:opacity-90"
+                    style={{ background: '#f2ede4' }}
                 >
-                    <span className="text-[10px] uppercase tracking-[0.14em] opacity-60" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{f.lbl}</span>
-                    <span className="flex items-center justify-between gap-2 text-[14px] font-medium text-[#f2ede4]">
-                        {f.val}
-                        <span className="opacity-60"><ChevronDownIcon /></span>
+                    {t.search_cta}
+                    <span className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: '#0b0b0c', color: '#f2ede4' }}>
+                        <ArrowIcon />
                     </span>
-                </div>
-            ))}
-            <Link
-                href="/rent"
-                className="rounded-[14px] px-6 flex items-center gap-3 font-semibold text-[14px] text-[#0b0b0c] transition-all duration-200 hover:opacity-90"
-                style={{ background: '#f2ede4' }}
-            >
-                {t.search_cta}
-                <span className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: '#0b0b0c', color: '#f2ede4' }}>
-                    <ArrowIcon />
-                </span>
-            </Link>
+                </button>
+            </div>
         </div>
     )
 }
 
-function Hero({ t }: { t: T }) {
+function Hero({ t, meta }: { t: T; meta: SearchMeta }) {
     return (
         <section
             className="relative overflow-hidden text-[#f2ede4]"
@@ -521,7 +674,7 @@ function Hero({ t }: { t: T }) {
                     {t.hero_sub}
                 </p>
                 <div className="hidden md:block">
-                    <SearchBar t={t} />
+                    <SearchBar t={t} meta={meta} />
                 </div>
                 <div className="md:hidden flex gap-3 mt-2">
                     <Link href="/rent" className="h-12 px-7 rounded-full flex items-center gap-2 font-semibold text-[14px] text-[#0b0b0c]" style={{ background: '#f2ede4' }}>
@@ -636,7 +789,7 @@ function SellPanel({ t }: { t: T }) {
 
 type Mode = 'rent' | 'buy' | 'sell' | 'parts'
 
-function Listings({ t, mode, setMode, data }: { t: T; mode: Mode; setMode: (m: Mode) => void; data: LandingData }) {
+function Listings({ t, mode, setMode, data }: { t: T; mode: Mode; setMode: (m: Mode) => void; data: Omit<LandingData, 'searchMeta'> }) {
     const modes: { id: Mode; label: string; badge: string }[] = [
         { id: 'rent', label: t.mode_rent, badge: t.mode_badge_rent },
         { id: 'buy', label: t.mode_buy, badge: t.mode_badge_buy },
@@ -1138,14 +1291,14 @@ function LandingFooterBanner({ t }: { t: T }) {
 }
 
 /* ─── Main export ─── */
-export function LandingPage({ rentCars, saleCars, parts }: LandingData) {
+export function LandingPage({ rentCars, saleCars, parts, searchMeta }: LandingData) {
     const { lang } = useLanguage()
     const t = T[lang]
     const [mode, setMode] = useState<Mode>('rent')
 
     return (
         <div className="-mt-[56px] overflow-x-hidden">
-            <Hero t={t} />
+            <Hero t={t} meta={searchMeta} />
             <Ticker t={t} />
             <Listings t={t} mode={mode} setMode={setMode} data={{ rentCars, saleCars, parts }} />
             <Showcase t={t} />

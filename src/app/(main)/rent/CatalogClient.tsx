@@ -1,12 +1,15 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { SlidersHorizontal, X, ChevronDown } from 'lucide-react'
 import { CarCard } from './CarCard'
+import { useDict } from '@/contexts/LanguageContext'
 import type { CarForRent } from '@/types'
 
 interface Filters {
     brand: string
+    city: string
     transmission: string
     fuel_type: string
     seats: string
@@ -16,6 +19,7 @@ interface Filters {
 
 const defaultFilters: Filters = {
     brand: '',
+    city: '',
     transmission: '',
     fuel_type: '',
     seats: '',
@@ -26,19 +30,34 @@ const defaultFilters: Filters = {
 interface Props {
     cars: CarForRent[]
     brands: string[]
+    cities: string[]
 }
 
-export function CatalogClient({ cars, brands }: Props) {
-    const [filters, setFilters] = useState<Filters>(defaultFilters)
-    const [applied, setApplied] = useState<Filters>(defaultFilters)
+export function CatalogClient({ cars, brands, cities }: Props) {
+    const { rent: t, common } = useDict()
+    const searchParams = useSearchParams()
+
+    // Начальные фильтры из URL (?brand=&city=&fuel_type=&priceMax=…) — приходят из Hero-поиска
+    const initial = useMemo<Filters>(() => ({
+        brand: searchParams.get('brand') ?? '',
+        city: searchParams.get('city') ?? '',
+        transmission: searchParams.get('transmission') ?? '',
+        fuel_type: searchParams.get('fuel_type') ?? '',
+        seats: searchParams.get('seats') ?? '',
+        priceMin: searchParams.get('priceMin') ?? '',
+        priceMax: searchParams.get('priceMax') ?? '',
+    }), [searchParams])
+
+    const [filters, setFilters] = useState<Filters>(initial)
+    const [applied, setApplied] = useState<Filters>(initial)
     const [showFilters, setShowFilters] = useState(false)
     const [sortBy, setSortBy] = useState('newest')
     const [showSortSheet, setShowSortSheet] = useState(false)
 
     const sortOptions = [
-        { value: 'newest', label: 'Сначала новые' },
-        { value: 'price_asc', label: 'Сначала дешевле' },
-        { value: 'price_desc', label: 'Сначала дороже' },
+        { value: 'newest', label: t.sortNewest },
+        { value: 'price_asc', label: t.sortPriceAsc },
+        { value: 'price_desc', label: t.sortPriceDesc },
     ]
 
     function applyFilters() {
@@ -57,6 +76,7 @@ export function CatalogClient({ cars, brands }: Props) {
         let result = [...cars]
 
         if (applied.brand) result = result.filter(c => c.brand === applied.brand)
+        if (applied.city) result = result.filter(c => (c.location ?? '').split(',')[0].trim() === applied.city)
         if (applied.transmission) result = result.filter(c => c.transmission === applied.transmission)
         if (applied.fuel_type) result = result.filter(c => c.fuel_type === applied.fuel_type)
         if (applied.seats) result = result.filter(c => c.seats === Number(applied.seats))
@@ -83,7 +103,7 @@ export function CatalogClient({ cars, brands }: Props) {
                         }`}
                 >
                     <SlidersHorizontal size={15} />
-                    Фильтры
+                    {t.filters}
                     {hasActiveFilters && (
                         <span className="w-5 h-5 bg-[#0a0a0a]/20 rounded-full text-[11px] flex items-center justify-center">
                             {Object.values(applied).filter(v => v !== '').length}
@@ -99,7 +119,7 @@ export function CatalogClient({ cars, brands }: Props) {
                             className="inline-flex items-center gap-1.5 h-10 px-3 text-[13px] text-[#6b6b6b] hover:text-[#ff3b30] transition-colors"
                         >
                             <X size={14} />
-                            Сбросить
+                            {common.reset}
                         </button>
                     )}
 
@@ -129,7 +149,7 @@ export function CatalogClient({ cars, brands }: Props) {
 
             {/* ── Результат ── */}
             <p className="text-[13px] text-[#6b6b6b] mb-4">
-                Найдено: <span className="text-[#f0ece4] font-medium">{filtered.length}</span> авто
+                {t.found}: <span className="text-[#f0ece4] font-medium">{filtered.length}</span> {t.cars}
             </p>
 
             {/* ── Grid ── */}
@@ -143,16 +163,16 @@ export function CatalogClient({ cars, brands }: Props) {
                 <div className="text-center py-20 fade-in">
                     <p className="text-[40px] mb-4">🚗</p>
                     <p className="text-[18px] font-bold tracking-tight mb-2 text-[#f0ece4]">
-                        Ничего не найдено
+                        {t.emptyTitle}
                     </p>
                     <p className="text-[14px] text-[#6b6b6b] mb-6">
-                        Попробуйте изменить фильтры
+                        {t.emptySub}
                     </p>
                     <button
                         onClick={resetFilters}
                         className="h-10 px-6 bg-[#c9a96e] text-[#0a0a0a] text-[14px] font-semibold rounded-[10px] hover:bg-[#d4b87a] transition-all duration-300"
                     >
-                        Сбросить фильтры
+                        {t.resetFilters}
                     </button>
                 </div>
             )}
@@ -173,6 +193,7 @@ export function CatalogClient({ cars, brands }: Props) {
                             filters={filters}
                             setFilters={setFilters}
                             brands={brands}
+                            cities={cities}
                             onApply={applyFilters}
                             onClose={() => setShowFilters(false)}
                             onReset={resetFilters}
@@ -185,6 +206,7 @@ export function CatalogClient({ cars, brands }: Props) {
                             filters={filters}
                             setFilters={setFilters}
                             brands={brands}
+                            cities={cities}
                             onApply={applyFilters}
                             onClose={() => setShowFilters(false)}
                             onReset={resetFilters}
@@ -203,7 +225,7 @@ export function CatalogClient({ cars, brands }: Props) {
                     />
                     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#111111] rounded-t-[20px] px-5 pt-5 pb-8 shadow-lg border-t border-white/[0.06] slide-in-from-bottom">
                         <div className="w-10 h-1 bg-white/[0.10] rounded-full mx-auto mb-6" />
-                        <p className="text-[16px] font-bold tracking-tight mb-4 text-[#f0ece4]">Сортировка</p>
+                        <p className="text-[16px] font-bold tracking-tight mb-4 text-[#f0ece4]">{t.sort}</p>
                         <div className="flex flex-col gap-2">
                             {sortOptions.map(o => (
                                 <button
@@ -232,12 +254,14 @@ interface FilterPanelProps {
     filters: Filters
     setFilters: (f: Filters) => void
     brands: string[]
+    cities: string[]
     onApply: () => void
     onClose: () => void
     onReset: () => void
 }
 
-function FilterPanel({ filters, setFilters, brands, onApply, onClose, onReset }: FilterPanelProps) {
+function FilterPanel({ filters, setFilters, brands, cities, onApply, onClose, onReset }: FilterPanelProps) {
+    const { rent: t, common } = useDict()
     function set(key: keyof Filters, value: string) {
         setFilters({ ...filters, [key]: value })
     }
@@ -248,7 +272,7 @@ function FilterPanel({ filters, setFilters, brands, onApply, onClose, onReset }:
             <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-white/[0.06] flex-shrink-0">
                 {/* Mobile handle */}
                 <div className="md:hidden w-10 h-1 bg-white/[0.10] rounded-full absolute left-1/2 -translate-x-1/2 top-3" />
-                <p className="text-[17px] font-bold tracking-tight text-[#f0ece4]">Фильтры</p>
+                <p className="text-[17px] font-bold tracking-tight text-[#f0ece4]">{t.filters}</p>
                 <button
                     onClick={onClose}
                     className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/[0.06] text-[#6b6b6b] transition-colors"
@@ -260,73 +284,84 @@ function FilterPanel({ filters, setFilters, brands, onApply, onClose, onReset }:
             {/* Filters */}
             <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-6">
 
+                {/* Город */}
+                {cities.length > 0 && (
+                    <FilterSelect
+                        label={t.city}
+                        value={filters.city}
+                        onChange={v => set('city', v)}
+                        options={cities.map(c => ({ value: c, label: c }))}
+                        placeholder={t.cityAll}
+                    />
+                )}
+
                 {/* Марка */}
                 <FilterSelect
-                    label="Марка"
+                    label={t.brand}
                     value={filters.brand}
                     onChange={v => set('brand', v)}
                     options={brands.map(b => ({ value: b, label: b }))}
-                    placeholder="Все марки"
+                    placeholder={t.brandAll}
                 />
 
                 {/* КПП */}
                 <FilterSelect
-                    label="Коробка передач"
+                    label={t.transmission}
                     value={filters.transmission}
                     onChange={v => set('transmission', v)}
                     options={[
-                        { value: 'auto', label: 'Автомат' },
-                        { value: 'manual', label: 'Механика' },
+                        { value: 'auto', label: t.auto },
+                        { value: 'manual', label: t.manual },
                     ]}
-                    placeholder="Любая"
+                    placeholder={t.transAny}
                 />
 
                 {/* Топливо */}
                 <FilterSelect
-                    label="Тип топлива"
+                    label={t.fuel}
                     value={filters.fuel_type}
                     onChange={v => set('fuel_type', v)}
                     options={[
-                        { value: 'petrol', label: 'Бензин' },
-                        { value: 'diesel', label: 'Дизель' },
-                        { value: 'electric', label: 'Электро' },
-                        { value: 'hybrid', label: 'Гибрид' },
+                        { value: 'petrol', label: t.petrol },
+                        { value: 'diesel', label: t.diesel },
+                        { value: 'electric', label: t.electric },
+                        { value: 'hybrid', label: t.hybrid },
                     ]}
-                    placeholder="Любой"
+                    placeholder={t.fuelAny}
                 />
 
                 {/* Мест */}
                 <FilterSelect
-                    label="Количество мест"
+                    label={t.seats}
                     value={filters.seats}
                     onChange={v => set('seats', v)}
                     options={[
-                        { value: '2', label: '2 места' },
-                        { value: '4', label: '4 места' },
-                        { value: '5', label: '5 мест' },
-                        { value: '7', label: '7 мест' },
+                        { value: '2', label: t.seat2 },
+                        { value: '4', label: t.seat4 },
+                        { value: '5', label: t.seat5 },
+                        { value: '7', label: t.seat7 },
                     ]}
-                    placeholder="Любое"
+                    placeholder={t.seatsAny}
                 />
 
                 {/* Цена */}
                 <div>
                     <p className="text-[13px] font-medium text-[#6b6b6b] mb-3">
-                        Цена за сутки (₸)
+                        {t.price}
                     </p>
                     <div className="flex gap-3">
                         <input
                             type="number"
                             value={filters.priceMin}
                             onChange={e => set('priceMin', e.target.value)}
-                            placeholder="От"
+                            placeholder={t.priceFrom}
                             className="w-full h-11 px-3.5 bg-[#161616] border border-white/[0.08] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] transition-all"
                         />
                         <input
                             type="number"
                             value={filters.priceMax}
                             onChange={e => set('priceMax', e.target.value)}
-                            placeholder="До"
+                            placeholder={t.priceTo}
                             className="w-full h-11 px-3.5 bg-[#161616] border border-white/[0.08] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] transition-all"
                         />
                     </div>
@@ -340,13 +375,13 @@ function FilterPanel({ filters, setFilters, brands, onApply, onClose, onReset }:
                     onClick={onReset}
                     className="flex-1 h-11 bg-[#1a1a1a] text-[#f0ece4] font-medium rounded-[10px] border border-white/[0.08] hover:bg-white/[0.04] transition-colors text-[15px]"
                 >
-                    Сбросить
+                    {common.reset}
                 </button>
                 <button
                     onClick={onApply}
                     className="flex-1 h-11 bg-[#c9a96e] text-[#0a0a0a] font-semibold rounded-[10px] hover:bg-[#d4b87a] transition-all duration-300 text-[15px]"
                 >
-                    Применить
+                    {common.apply}
                 </button>
             </div>
         </div>

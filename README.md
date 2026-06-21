@@ -1,36 +1,146 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NomadDrive
 
-## Getting Started
+Платформа аренды, покупки и продажи автомобилей + магазин запчастей.
+Next.js 16 (App Router) · Supabase · Tailwind CSS 4.
 
-First, run the development server:
+Прод: **https://nomad-drive-gzi8.vercel.app/**
+
+## Запуск
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Переменные окружения — в `.env.local` (`NEXT_PUBLIC_SUPABASE_URL`,
+`NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+База данных: `db/dump.sql` — полная схема + RLS + демо-данные + админ-юзер
+(см. `db/README.md`).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Журнал работ
 
-To learn more about Next.js, take a look at the following resources:
+> Лог ведётся поэтапно, чтобы при обрыве сессии можно было продолжить.
+> Каждый этап: что сделано → какие файлы → статус.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Этап 1 — Админ-панель ✅
+**Итог:** админ-панель уже существует и полностью рабочая — пересоздавать не
+пришлось, проверена и задокументирована.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Расположение: `src/app/admin/`
+- `layout.tsx` — гард доступа: проверяет `auth.getUser()` и `profiles.role === 'admin'`,
+  иначе редирект на `/login` или `/`.
+- `page.tsx` — дашборд: живые счётчики (авто в аренде/продаже, запчасти, брони,
+  заказы) + последние брони и заказы.
+- `cars/`, `sale/`, `parts/` — списки + `[id]/` формы создания/редактирования
+  (роут `/admin/cars/new` и т.п. обрабатывается тем же `[id]`-сегментом).
+- `bookings/`, `orders/` — просмотр и смена статусов.
+- `AdminSidebar.tsx` — навигация + выход, `AdminStatusBadge.tsx` — статусы.
 
-## Deploy on Vercel
+Доступ ограничен и на уровне `proxy.ts` (бывш. middleware): `/admin` в списке
+защищённых маршрутов; роль дополнительно проверяется в `layout.tsx`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Проверка: `npx tsc --noEmit` — без ошибок.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Этап 2 — Рабочий поиск в Hero ✅
+**Итог:** статичный поиск в Hero заменён на рабочий — 4 выпадающих списка с
+реальными вариантами из БД; «Найти авто» ведёт в каталог с применёнными фильтрами.
+
+Что сделано:
+- `src/app/(main)/page.tsx` — добавлен запрос всех доступных авто в аренду
+  (`brand, location`), из него считаются уникальные **марки** и **города**,
+  передаются в лендинг как `searchMeta`.
+- `src/app/(main)/LandingPage.tsx`:
+  - новый компонент `HeroSelect` — кастомный тёмный дропдаун (выбор из вариантов,
+    закрытие по клику вне, подсветка активного);
+  - `SearchBar` переписан: поля **Город / Марка / Тип топлива / Цена за сутки**,
+    кнопка сброса и «Найти авто» → `router.push('/rent?city=…&brand=…&fuel_type=…&priceMax/Min=…')`;
+  - ключи переводов поиска обновлены для РУС и ҚАЗ.
+- `src/app/(main)/rent/page.tsx` — считает список городов, оборачивает каталог в
+  `<Suspense>` (требование для `useSearchParams`), прокидывает `cities`.
+- `src/app/(main)/rent/CatalogClient.tsx`:
+  - читает стартовые фильтры из URL (`useSearchParams`) — параметры из Hero
+    применяются сразу при заходе;
+  - добавлен фильтр и селектор **Город** (по первой части `location`).
+
+Проверка: `npx tsc --noEmit` — без ошибок.
+
+### Этап 3 — Рабочий QR ✅
+**Итог:** QR-код брони теперь кодирует **рабочую ссылку** на задеплоенный сайт
+(`https://nomad-drive-gzi8.vercel.app/booking/<id>`), а не JSON. Скан со смартфона
+открывает страницу проверки брони.
+
+Что сделано:
+- `src/lib/site.ts` — `SITE_URL` (из `NEXT_PUBLIC_SITE_URL`, дефолт — прод-адрес,
+  чтобы QR работал при скане телефоном) и `bookingVerifyUrl(id)`.
+- `.env.local` — добавлен `NEXT_PUBLIC_SITE_URL=https://nomad-drive-gzi8.vercel.app`.
+- `src/app/(main)/booking/[id]/page.tsx` — публичная страница проверки брони
+  (маршрут `/booking/...` не входит в защищённые в `proxy.ts`). Данные берёт через
+  RPC `verify_booking` (работает и для неавторизованного сотрудника на выдаче),
+  с мягким откатом на чтение под RLS.
+- `src/app/(main)/booking/[id]/BookingVerifyCard.tsx` — карточка проверки
+  (статус брони, авто, даты, оплата, сумма, номер), **сразу двуязычная** РУС/ҚАЗ.
+- `src/app/(main)/dashboard/bookings/[id]/page.tsx` — `qrData` теперь
+  `bookingVerifyUrl(booking.id)`.
+- `QRCodeWidget.tsx` — QR кликабелен (открывает ссылку), под ним показывается
+  сам адрес; скачивание сохранено.
+- `db/dump.sql` — добавлена security-definer функция `verify_booking(uuid)` +
+  `grant execute ... to anon, authenticated`.
+
+⚠️ Чтобы проверка работала на проде, нужно один раз накатить обновлённый
+`db/dump.sql` (там же создаётся админ-юзер — см. Этап 4).
+
+Проверка: `npx tsc --noEmit` — без ошибок.
+
+### Этап 4 — Дамп БД + админ-юзер ✅
+**Итог:** `db/dump.sql` теперь создаёт **готового админа** и публичную RPC для QR —
+после одного `Run` в SQL Editor панель `/admin` и проверка брони работают сразу.
+
+Что сделано:
+- `db/dump.sql` — добавлен идемпотентный блок создания администратора:
+  - запись в `auth.users` (подтверждённый email, зашифрованный пароль `bcrypt`),
+  - запись в `auth.identities` с учётом разных версий схемы (наличие `provider_id`,
+    тип `id` — uuid/text),
+  - профиль с `role='admin'` (`on conflict do update`).
+  - **Логин:** `admin@nomaddrive.kz` · **Пароль:** `Admin12345!`
+- ранее (Этап 3) добавлена функция `verify_booking(uuid)` для QR.
+- `db/README.md` — обновлён: данные админа, фолбэки, описание RPC.
+
+⚠️ Применить вручную: Supabase Dashboard → **SQL Editor → New query** → вставить
+`db/dump.sql` → **Run** (в этом окружении нет доступа к сети/БД, выполнить нельзя).
+
+### Этап 5 — Перевод РУС/ҚАЗ на всех страницах ⏳
+Ведётся постранично. Прогресс по пунктам ниже (для возобновления после обрыва).
+
+**5.0 Фундамент ✅**
+- `LanguageProvider` перенесён в корневой `layout.tsx` — теперь покрывает ВСЕ
+  группы маршрутов: `(main)`, `(auth)`, `/admin` (раньше был только в `(main)`).
+- Язык хранится в **cookie `lang`** (+ `localStorage`) — переживает перезагрузку
+  и работает между группами. При переключении вызывается `router.refresh()`,
+  поэтому **серверные компоненты тоже перерисовываются** на новом языке.
+- `src/lib/i18n.ts` — общий словарь РУС/ҚАЗ (клиент+сервер), `getDict()`.
+- `src/lib/i18n.server.ts` — `getServerLang()` / `getServerDict()` (читают cookie).
+- `useDict()` в `LanguageContext` — словарь для клиентских компонентов.
+- Корневой `<html lang>` ставится из cookie.
+
+**Чек-лист страниц:**
+- [x] 5.1 Общие компоненты — `LogoutButton`, `Footer` переведены через `useDict`;
+  Navbar/MobileMenu уже были двуязычными. Добавлены неймспейсы `footer`, `logout`.
+- [x] 5.2 Аренда (каталог + карточка) — `rent/page.tsx` (серверный, `getServerDict`),
+  `CatalogClient.tsx` (тулбар, сортировка, все фильтры, пустые состояния),
+  `CarCard.tsx` (статусы, КПП/топливо/места, цена, кнопка). Неймспейс `rent`.
+- [x] 5.3 Продажа (каталог + карточка) — `sale/page.tsx`, `SaleClient.tsx`
+  (фильтры марка/КПП/топливо/цена/год/пробег, сортировка, пустые состояния),
+  `SaleCard.tsx` (статусы, год/пробег/КПП/топливо, кнопка). Неймспейс `sale`.
+- [x] 5.4 Запчасти (каталог + карточка) — `parts/page.tsx`, `PartsClient.tsx`
+  (поиск, фильтры категория/производитель/марка авто/цена/в наличии, сортировка,
+  тост корзины, пустые состояния), `PartCard.tsx` (сток, OEM, кнопка корзины).
+- [ ] 5.5 Детальная авто в аренду + бронирование
+- [ ] 5.6 Детальная авто на продажу
+- [ ] 5.7 Личный кабинет (+ брони, заказы, профиль)
+- [ ] 5.8 Корзина
+- [ ] 5.9 Авторизация (вход, регистрация, восстановление)
+- [ ] 5.10 Админ-панель
+- [x] Страница проверки брони `/booking/[id]` (сделана двуязычной в Этапе 3)

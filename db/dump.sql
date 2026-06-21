@@ -203,6 +203,34 @@ as $$
     );
 $$;
 
+-- Публичная проверка брони по QR-коду (security definer — обходит RLS,
+-- отдаёт только безопасный минимум полей; доступно anon и authenticated).
+create or replace function public.verify_booking(p_id uuid)
+returns table (
+    id             uuid,
+    brand          text,
+    model          text,
+    year           int,
+    start_date     date,
+    end_date       date,
+    status         text,
+    payment_status text,
+    total_price    numeric
+)
+language sql
+security definer
+stable
+set search_path = public
+as $$
+    select b.id, c.brand, c.model, c.year,
+           b.start_date, b.end_date, b.status, b.payment_status, b.total_price
+    from public.bookings b
+    join public.cars_for_rent c on c.id = b.car_id
+    where b.id = p_id;
+$$;
+
+grant execute on function public.verify_booking(uuid) to anon, authenticated;
+
 -- Автосоздание профиля при регистрации в auth.users
 create or replace function public.handle_new_user()
 returns trigger
@@ -457,10 +485,106 @@ insert into public.promo_codes (code, type, value, max_uses, expires_at, is_acti
 ('WELCOME15','percent',15, 500,  now() + interval '90 days',  true),
 ('DRIVE50K','fixed', 50000, 200, now() + interval '60 days',  true);
 
+-- ═════════════════════════════════════════════════════════════════════
+--  АДМИНИСТРАТОР  (готовый аккаунт — панель /admin доступна сразу)
+-- ---------------------------------------------------------------------
+--    Логин:  admin@nomaddrive.kz
+--    Пароль: Admin12345!
+--
+--  Блок идемпотентный и устойчив к разным версиям схемы Supabase Auth:
+--    • создаёт (или обновляет) пользователя в auth.users с подтверждённым
+--      email и зашифрованным паролем;
+--    • добавляет запись в auth.identities (учитывая, что в новых версиях
+--      есть колонка provider_id и id типа uuid, а в старых id — text);
+--    • создаёт/обновляет профиль с ролью 'admin'.
+--  ⚠️ Смените пароль после первого входа.
+-- ═════════════════════════════════════════════════════════════════════
+do $$
+declare
+    v_uid     uuid;
+    v_email   text := 'admin@nomaddrive.kz';
+    v_pass    text := 'Admin12345!';
+    v_name    text := 'Администратор';
+    v_id_type text;
+begin
+    -- 1. Найти или создать пользователя в auth.users
+    select id into v_uid from auth.users where email = v_email;
+
+    if v_uid is null then
+        v_uid := gen_random_uuid();
+        insert into auth.users (
+            instance_id, id, aud, role, email, encrypted_password,
+            email_confirmed_at, created_at, updated_at,
+            raw_app_meta_data, raw_user_meta_data,
+            confirmation_token, recovery_token, email_change_token_new, email_change
+        ) values (
+            '00000000-0000-0000-0000-000000000000', v_uid,
+            'authenticated', 'authenticated', v_email,
+            crypt(v_pass, gen_salt('bf')),
+            now(), now(), now(),
+            '{"provider":"email","providers":["email"]}'::jsonb,
+            jsonb_build_object('full_name', v_name),
+            '', '', '', ''
+        );
+    else
+        -- при повторном запуске — обновить пароль и подтвердить email
+        update auth.users
+           set encrypted_password = crypt(v_pass, gen_salt('bf')),
+               email_confirmed_at  = coalesce(email_confirmed_at, now()),
+               updated_at          = now()
+         where id = v_uid;
+    end if;
+
+    -- 2. Запись в auth.identities (если ещё нет)
+    if not exists (
+        select 1 from auth.identities where user_id = v_uid and provider = 'email'
+    ) then
+        select data_type into v_id_type
+          from information_schema.columns
+         where table_schema = 'auth' and table_name = 'identities' and column_name = 'id';
+
+        if exists (
+            select 1 from information_schema.columns
+             where table_schema = 'auth' and table_name = 'identities' and column_name = 'provider_id'
+        ) then
+            -- новая схема: id uuid + provider_id text
+            insert into auth.identities
+                (id, user_id, identity_data, provider, provider_id, last_sign_in_at, created_at, updated_at)
+            values
+                (gen_random_uuid(), v_uid,
+                 jsonb_build_object('sub', v_uid::text, 'email', v_email),
+                 'email', v_uid::text, now(), now(), now());
+        elsif v_id_type = 'uuid' then
+            insert into auth.identities
+                (id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+            values
+                (gen_random_uuid(), v_uid,
+                 jsonb_build_object('sub', v_uid::text, 'email', v_email),
+                 'email', now(), now(), now());
+        else
+            -- старая схема: id text (= provider sub)
+            insert into auth.identities
+                (id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+            values
+                (v_uid::text, v_uid,
+                 jsonb_build_object('sub', v_uid::text, 'email', v_email),
+                 'email', now(), now(), now());
+        end if;
+    end if;
+
+    -- 3. Профиль с ролью admin (строку мог создать триггер handle_new_user)
+    insert into public.profiles (id, full_name, role)
+    values (v_uid, v_name, 'admin')
+    on conflict (id) do update
+        set role = 'admin', full_name = excluded.full_name;
+end $$;
+
 -- =====================================================================
 --  Готово. Проверка:
 --    select count(*) from public.cars_for_rent;   -- 10
 --    select count(*) from public.cars_for_sale;   -- 10
 --    select count(*) from public.parts;           -- 14
 --    select count(*) from public.promo_codes;     -- 3
+--    select email, role from public.profiles
+--      join auth.users using (id) where role='admin'; -- admin@nomaddrive.kz
 -- =====================================================================

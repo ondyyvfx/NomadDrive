@@ -1,14 +1,19 @@
-import Link from 'next/link'
+'use client'
 
-const links = [
-    { href: '/rent', label: 'Аренда авто' },
-    { href: '/sale', label: 'Продажа авто' },
-    { href: '/parts', label: 'Запчасти' },
-    { href: '/login', label: 'Войти' },
-    { href: '/register', label: 'Регистрация' },
-]
+import Link from 'next/link'
+import { useDict } from '@/contexts/LanguageContext'
 
 export function Footer() {
+    const { footer: t } = useDict()
+
+    const links = [
+        { href: '/rent', label: t.rent },
+        { href: '/sale', label: t.sale },
+        { href: '/parts', label: t.parts },
+        { href: '/login', label: t.login },
+        { href: '/register', label: t.register },
+    ]
+
     return (
         <footer className="border-t border-white/[0.06] bg-[#0a0a0a]">
             <div className="max-w-[1200px] mx-auto px-5 py-12">
@@ -37,10 +42,10 @@ export function Footer() {
 
                 <div className="mt-10 pt-6 border-t border-white/[0.06] flex flex-col md:flex-row items-center justify-between gap-2">
                     <p className="text-[14px] text-[#3d3d3d]">
-                        © 2026 NomadDrive
+                        {t.copy}
                     </p>
                     <p className="text-[14px] text-[#3d3d3d]">
-                        Алматы, Казахстан · +7 700 700 70 00
+                        {t.address}
                     </p>
                 </div>
 

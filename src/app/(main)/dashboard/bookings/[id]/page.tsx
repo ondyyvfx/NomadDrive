@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { QRCodeWidget } from './QRCodeWidget'
 import { CancelBookingButton } from './CancelBookingButton'
+import { bookingVerifyUrl } from '@/lib/site'
 import Image from 'next/image'
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
@@ -48,13 +49,8 @@ export default async function BookingDetailPage({
         (new Date(booking.end_date).getTime() - new Date(booking.start_date).getTime()) / 86400000
     )
 
-    const qrData = JSON.stringify({
-        booking_id: booking.id,
-        car: car ? `${car.brand} ${car.model}` : '',
-        start: booking.start_date,
-        end: booking.end_date,
-        total: booking.total_price,
-    })
+    // QR кодирует рабочую ссылку на публичную проверку брони (открывается со смартфона)
+    const qrData = bookingVerifyUrl(booking.id)
 
     return (
         <div className="max-w-[800px] mx-auto px-5 py-10">

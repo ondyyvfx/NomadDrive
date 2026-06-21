@@ -1,21 +1,20 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { MapPin, Users, Fuel, Settings2 } from 'lucide-react'
 import type { CarForRent } from '@/types'
-
-const transmissionLabel: Record<string, string> = {
-    auto: 'Автомат', manual: 'Механика',
-}
-const fuelLabel: Record<string, string> = {
-    petrol: 'Бензин', diesel: 'Дизель', electric: 'Электро', hybrid: 'Гибрид',
-}
-const statusConfig: Record<string, { label: string; classes: string }> = {
-    available: { label: 'Доступен', classes: 'text-[#34c759]' },
-    rented: { label: 'Занят', classes: 'text-[#ff9f0a]' },
-    maintenance: { label: 'На ТО', classes: 'text-[#6b6b6b]' },
-}
+import { useDict } from '@/contexts/LanguageContext'
 
 export function CarCard({ car, priority = false }: { car: CarForRent; priority?: boolean }) {
+    const { rent: t, common } = useDict()
+    const transmissionLabel: Record<string, string> = { auto: t.auto, manual: t.manual }
+    const fuelLabel: Record<string, string> = { petrol: t.petrol, diesel: t.diesel, electric: t.electric, hybrid: t.hybrid }
+    const statusConfig: Record<string, { label: string; classes: string }> = {
+        available: { label: t.statusAvailable, classes: 'text-[#34c759]' },
+        rented: { label: t.statusRented, classes: 'text-[#ff9f0a]' },
+        maintenance: { label: t.statusMaintenance, classes: 'text-[#6b6b6b]' },
+    }
     const status = statusConfig[car.status] ?? statusConfig.available
     const image = car.image_urls?.[0]
 
@@ -51,8 +50,8 @@ export function CarCard({ car, priority = false }: { car: CarForRent; priority?:
                 {/* Цена */}
                 <div className="absolute bottom-3 right-3">
                     <span className="inline-flex items-center px-3 py-1.5 bg-black/75 backdrop-blur-sm rounded-[10px] text-[13px] font-semibold text-[#f0ece4] shadow-sm">
-                        {car.price_per_day.toLocaleString('ru-RU')} ₸
-                        <span className="text-[11px] font-normal text-[#6b6b6b] ml-1">/день</span>
+                        {car.price_per_day.toLocaleString(common.locale)} ₸
+                        <span className="text-[11px] font-normal text-[#6b6b6b] ml-1">{t.daySuffix}</span>
                     </span>
                 </div>
             </div>
@@ -82,7 +81,7 @@ export function CarCard({ car, priority = false }: { car: CarForRent; priority?:
                     {car.seats && (
                         <div className="flex items-center gap-1.5 text-[12px] text-[#6b6b6b]">
                             <Users size={13} className="flex-shrink-0" />
-                            {car.seats} мест
+                            {car.seats} {t.seatsShort}
                         </div>
                     )}
                     {car.location && (
@@ -98,7 +97,7 @@ export function CarCard({ car, priority = false }: { car: CarForRent; priority?:
                             ? 'bg-[#c9a96e]/[0.08] text-[#c9a96e] group-hover:bg-[#c9a96e] group-hover:text-[#0a0a0a]'
                             : 'bg-[#1a1a1a] text-[#3d3d3d] cursor-not-allowed'
                         }`}>
-                        {car.status === 'available' ? 'Забронировать' : 'Недоступен'}
+                        {car.status === 'available' ? t.book : t.unavailable}
                     </div>
                 </div>
             </div>

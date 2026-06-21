@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { SlidersHorizontal, X, ChevronDown, ShoppingCart, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { PartCard } from './PartCard'
+import { useDict } from '@/contexts/LanguageContext'
 import type { Part } from '@/types'
 import type { CartItem } from '@/types'
 
@@ -31,6 +32,7 @@ interface Props {
 const CART_KEY = 'nomaddrive_cart'
 
 export function PartsClient({ parts, brands, carBrands, categories }: Props) {
+    const { parts: t, common } = useDict()
     const router = useRouter()
     const [filters, setFilters] = useState<Filters>(defaultFilters)
     const [applied, setApplied] = useState<Filters>(defaultFilters)
@@ -85,9 +87,9 @@ export function PartsClient({ parts, brands, carBrands, categories }: Props) {
     )
 
     const sortOptions = [
-        { value: 'newest', label: 'Сначала новые' },
-        { value: 'price_asc', label: 'Сначала дешевле' },
-        { value: 'price_desc', label: 'Сначала дороже' },
+        { value: 'newest', label: t.sortNewest },
+        { value: 'price_asc', label: t.sortPriceAsc },
+        { value: 'price_desc', label: t.sortPriceDesc },
     ]
 
     function applyFilters() {
@@ -139,7 +141,7 @@ export function PartsClient({ parts, brands, carBrands, categories }: Props) {
                         type="text"
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        placeholder="Поиск по названию, марке, OEM номеру..."
+                        placeholder={t.searchPlaceholder}
                         className="w-full h-11 pl-10 pr-4 bg-[#111111] border border-white/[0.08] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] transition-all"
                     />
                     {search && (
@@ -162,7 +164,7 @@ export function PartsClient({ parts, brands, carBrands, categories }: Props) {
                             }`}
                     >
                         <SlidersHorizontal size={15} />
-                        Фильтры
+                        {t.filters}
                         {hasActiveFilters && (
                             <span className="w-5 h-5 bg-[#0a0a0a]/20 rounded-full text-[11px] flex items-center justify-center">
                                 {Object.entries(applied).filter(([k, v]) => k === 'inStock' ? v : v !== '').length}
@@ -176,7 +178,7 @@ export function PartsClient({ parts, brands, carBrands, categories }: Props) {
                             className="inline-flex items-center gap-1.5 h-10 px-3 text-[13px] text-[#6b6b6b] hover:text-[#ff3b30] transition-colors"
                         >
                             <X size={14} />
-                            Сбросить
+                            {common.reset}
                         </button>
                     )}
 
@@ -218,7 +220,7 @@ export function PartsClient({ parts, brands, carBrands, categories }: Props) {
             </div>
 
             <p className="text-[13px] text-[#6b6b6b] mb-4">
-                Найдено: <span className="text-[#f0ece4] font-medium">{filtered.length}</span> позиций
+                {t.found}: <span className="text-[#f0ece4] font-medium">{filtered.length}</span> {t.items}
             </p>
 
             {/* Grid */}
@@ -237,15 +239,15 @@ export function PartsClient({ parts, brands, carBrands, categories }: Props) {
             ) : (
                 <div className="text-center py-20 fade-in">
                     <p className="text-[40px] mb-4">🔧</p>
-                    <p className="text-[18px] font-bold tracking-tight mb-2 text-[#f0ece4]">Ничего не найдено</p>
+                    <p className="text-[18px] font-bold tracking-tight mb-2 text-[#f0ece4]">{t.emptyTitle}</p>
                     <p className="text-[14px] text-[#6b6b6b] mb-6">
-                        Попробуйте изменить поисковый запрос или фильтры
+                        {t.emptySub}
                     </p>
                     <button
                         onClick={() => { resetFilters(); setSearch('') }}
                         className="h-10 px-6 bg-[#c9a96e] text-[#0a0a0a] text-[14px] font-semibold rounded-[10px] hover:bg-[#d4b87a] transition-all duration-300"
                     >
-                        Сбросить всё
+                        {t.resetAll}
                     </button>
                 </div>
             )}
@@ -285,7 +287,7 @@ export function PartsClient({ parts, brands, carBrands, categories }: Props) {
                     />
                     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#111111] rounded-t-[20px] px-5 pt-5 pb-8 shadow-lg border-t border-white/[0.06] slide-in-from-bottom">
                         <div className="w-10 h-1 bg-white/[0.10] rounded-full mx-auto mb-6" />
-                        <p className="text-[16px] font-bold tracking-tight mb-4 text-[#f0ece4]">Сортировка</p>
+                        <p className="text-[16px] font-bold tracking-tight mb-4 text-[#f0ece4]">{t.sort}</p>
                         <div className="flex flex-col gap-2">
                             {sortOptions.map(o => (
                                 <button
@@ -312,8 +314,8 @@ export function PartsClient({ parts, brands, carBrands, categories }: Props) {
                         onClick={() => router.push('/cart')}
                     >
                         <ShoppingCart size={16} />
-                        <span className="text-[14px] font-semibold">Добавлено в корзину</span>
-                        <span className="text-[13px] text-[#0a0a0a]/50">→ Перейти</span>
+                        <span className="text-[14px] font-semibold">{t.addedToCart}</span>
+                        <span className="text-[13px] text-[#0a0a0a]/50">{t.goTo}</span>
                     </div>
                 </div>
             )}
@@ -337,6 +339,7 @@ function PartsFilterPanel({
     filters, setFilters, brands, carBrands, categories,
     onApply, onClose, onReset,
 }: PartsFilterPanelProps) {
+    const { parts: t, common } = useDict()
     function set(key: keyof Filters, value: string | boolean) {
         setFilters({ ...filters, [key]: value })
     }
@@ -345,7 +348,7 @@ function PartsFilterPanel({
         <div className="flex flex-col h-full">
             <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-white/[0.06] flex-shrink-0 relative">
                 <div className="md:hidden w-10 h-1 bg-white/[0.10] rounded-full absolute left-1/2 -translate-x-1/2 top-3" />
-                <p className="text-[17px] font-bold tracking-tight text-[#f0ece4]">Фильтры</p>
+                <p className="text-[17px] font-bold tracking-tight text-[#f0ece4]">{t.filters}</p>
                 <button
                     onClick={onClose}
                     className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/[0.06] text-[#6b6b6b] transition-colors"
@@ -358,7 +361,7 @@ function PartsFilterPanel({
 
                 {/* Только в наличии */}
                 <label className="flex items-center justify-between cursor-pointer">
-                    <span className="text-[15px] font-medium text-[#f0ece4]">Только в наличии</span>
+                    <span className="text-[15px] font-medium text-[#f0ece4]">{t.onlyInStock}</span>
                     <div
                         onClick={() => set('inStock', !filters.inStock)}
                         className={`w-11 h-6 rounded-full transition-colors duration-200 relative flex-shrink-0 ${filters.inStock ? 'bg-[#c9a96e]' : 'bg-white/[0.12]'
@@ -371,47 +374,47 @@ function PartsFilterPanel({
 
                 {/* Категория */}
                 <FilterSelect
-                    label="Категория"
+                    label={t.category}
                     value={filters.category}
                     onChange={v => set('category', v)}
                     options={categories.map(c => ({ value: c, label: c }))}
-                    placeholder="Все категории"
+                    placeholder={t.categoryAll}
                 />
 
                 {/* Марка запчасти */}
                 <FilterSelect
-                    label="Производитель"
+                    label={t.manufacturer}
                     value={filters.brand}
                     onChange={v => set('brand', v)}
                     options={brands.map(b => ({ value: b, label: b }))}
-                    placeholder="Все"
+                    placeholder={t.manufacturerAll}
                 />
 
                 {/* Марка авто */}
                 <FilterSelect
-                    label="Марка автомобиля"
+                    label={t.carBrand}
                     value={filters.carBrand}
                     onChange={v => set('carBrand', v)}
                     options={carBrands.map(b => ({ value: b, label: b }))}
-                    placeholder="Все марки"
+                    placeholder={t.carBrandAll}
                 />
 
                 {/* Цена */}
                 <div>
-                    <p className="text-[13px] font-medium text-[#6b6b6b] mb-3">Цена (₸)</p>
+                    <p className="text-[13px] font-medium text-[#6b6b6b] mb-3">{t.priceLabel}</p>
                     <div className="flex gap-3">
                         <input
                             type="number"
                             value={filters.priceMin}
                             onChange={e => set('priceMin', e.target.value)}
-                            placeholder="От"
+                            placeholder={t.priceFrom}
                             className="w-full h-11 px-3.5 bg-[#161616] border border-white/[0.08] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] transition-all"
                         />
                         <input
                             type="number"
                             value={filters.priceMax}
                             onChange={e => set('priceMax', e.target.value)}
-                            placeholder="До"
+                            placeholder={t.priceTo}
                             className="w-full h-11 px-3.5 bg-[#161616] border border-white/[0.08] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] transition-all"
                         />
                     </div>
@@ -424,13 +427,13 @@ function PartsFilterPanel({
                     onClick={onReset}
                     className="flex-1 h-11 bg-[#1a1a1a] text-[#f0ece4] font-medium rounded-[10px] border border-white/[0.08] hover:bg-white/[0.04] transition-colors text-[15px]"
                 >
-                    Сбросить
+                    {common.reset}
                 </button>
                 <button
                     onClick={onApply}
                     className="flex-1 h-11 bg-[#c9a96e] text-[#0a0a0a] font-semibold rounded-[10px] hover:bg-[#d4b87a] transition-all duration-300 text-[15px]"
                 >
-                    Применить
+                    {common.apply}
                 </button>
             </div>
         </div>

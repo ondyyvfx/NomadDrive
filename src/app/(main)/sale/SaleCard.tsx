@@ -1,21 +1,20 @@
+'use client'
+
 import Link from 'next/link'
 import Image from 'next/image'
 import { MapPin, Gauge, Fuel, Settings2, Calendar } from 'lucide-react'
 import type { CarForSale } from '@/types'
-
-const transmissionLabel: Record<string, string> = {
-    auto: 'Автомат', manual: 'Механика',
-}
-const fuelLabel: Record<string, string> = {
-    petrol: 'Бензин', diesel: 'Дизель', electric: 'Электро', hybrid: 'Гибрид',
-}
-const statusConfig: Record<string, { label: string; classes: string }> = {
-    available: { label: 'В наличии', classes: 'text-[#34c759]' },
-    sold: { label: 'Продан', classes: 'text-[#ff3b30]' },
-    reserved: { label: 'Резерв', classes: 'text-[#ff9f0a]' },
-}
+import { useDict } from '@/contexts/LanguageContext'
 
 export function SaleCard({ car, priority = false }: { car: CarForSale; priority?: boolean }) {
+    const { sale: t, common } = useDict()
+    const transmissionLabel: Record<string, string> = { auto: t.auto, manual: t.manual }
+    const fuelLabel: Record<string, string> = { petrol: t.petrol, diesel: t.diesel, electric: t.electric, hybrid: t.hybrid }
+    const statusConfig: Record<string, { label: string; classes: string }> = {
+        available: { label: t.statusAvailable, classes: 'text-[#34c759]' },
+        sold: { label: t.statusSold, classes: 'text-[#ff3b30]' },
+        reserved: { label: t.statusReserved, classes: 'text-[#ff9f0a]' },
+    }
     const status = statusConfig[car.status] ?? statusConfig.available
     const image = car.image_urls?.[0]
 
@@ -54,18 +53,18 @@ export function SaleCard({ car, priority = false }: { car: CarForSale; priority?
                         {car.brand} {car.model}
                     </h3>
                     <p className="text-2xl font-bold tracking-tight text-[#f0ece4] mt-1">
-                        {car.price.toLocaleString('ru-RU')} ₸
+                        {car.price.toLocaleString(common.locale)} ₸
                     </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mb-4">
                     <div className="flex items-center gap-1.5 text-[12px] text-[#6b6b6b]">
                         <Calendar size={13} className="flex-shrink-0" />
-                        {car.year} год
+                        {car.year} {t.yearSuffix}
                     </div>
                     <div className="flex items-center gap-1.5 text-[12px] text-[#6b6b6b]">
                         <Gauge size={13} className="flex-shrink-0" />
-                        {car.mileage.toLocaleString('ru-RU')} км
+                        {car.mileage.toLocaleString(common.locale)} {t.kmSuffix}
                     </div>
                     {car.transmission && (
                         <div className="flex items-center gap-1.5 text-[12px] text-[#6b6b6b]">
@@ -98,7 +97,7 @@ export function SaleCard({ car, priority = false }: { car: CarForSale; priority?
                             ? 'bg-[#c9a96e]/[0.08] text-[#c9a96e] group-hover:bg-[#c9a96e] group-hover:text-[#0a0a0a]'
                             : 'bg-[#1a1a1a] text-[#3d3d3d] cursor-not-allowed'
                         }`}>
-                        {car.status === 'available' ? 'Подробнее' : status.label}
+                        {car.status === 'available' ? t.details : status.label}
                     </div>
                 </div>
             </div>

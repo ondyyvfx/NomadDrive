@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { SlidersHorizontal, X, ChevronDown } from 'lucide-react'
 import { SaleCard } from './SaleCard'
+import { useDict } from '@/contexts/LanguageContext'
 import type { CarForSale } from '@/types'
 
 interface Filters {
@@ -22,6 +23,7 @@ const defaultFilters: Filters = {
 }
 
 export function SaleClient({ cars, brands }: { cars: CarForSale[]; brands: string[] }) {
+    const { sale: t, common } = useDict()
     const [filters, setFilters] = useState<Filters>(defaultFilters)
     const [applied, setApplied] = useState<Filters>(defaultFilters)
     const [showFilters, setShowFilters] = useState(false)
@@ -29,10 +31,10 @@ export function SaleClient({ cars, brands }: { cars: CarForSale[]; brands: strin
     const [showSortSheet, setShowSortSheet] = useState(false)
 
     const sortOptions = [
-        { value: 'newest', label: 'Сначала новые' },
-        { value: 'price_asc', label: 'Сначала дешевле' },
-        { value: 'price_desc', label: 'Сначала дороже' },
-        { value: 'mileage', label: 'По пробегу' },
+        { value: 'newest', label: t.sortNewest },
+        { value: 'price_asc', label: t.sortPriceAsc },
+        { value: 'price_desc', label: t.sortPriceDesc },
+        { value: 'mileage', label: t.sortMileage },
     ]
 
     const hasActiveFilters = Object.values(applied).some(v => v !== '')
@@ -77,7 +79,7 @@ export function SaleClient({ cars, brands }: { cars: CarForSale[]; brands: strin
                         }`}
                 >
                     <SlidersHorizontal size={15} />
-                    Фильтры
+                    {t.filters}
                     {hasActiveFilters && (
                         <span className="w-5 h-5 bg-[#0a0a0a]/20 rounded-full text-[11px] flex items-center justify-center">
                             {Object.values(applied).filter(v => v !== '').length}
@@ -92,7 +94,7 @@ export function SaleClient({ cars, brands }: { cars: CarForSale[]; brands: strin
                             className="inline-flex items-center gap-1.5 h-10 px-3 text-[13px] text-[#6b6b6b] hover:text-[#ff3b30] transition-colors"
                         >
                             <X size={14} />
-                            Сбросить
+                            {common.reset}
                         </button>
                     )}
 
@@ -117,7 +119,7 @@ export function SaleClient({ cars, brands }: { cars: CarForSale[]; brands: strin
             </div>
 
             <p className="text-[13px] text-[#6b6b6b] mb-4">
-                Найдено: <span className="text-[#f0ece4] font-medium">{filtered.length}</span> авто
+                {t.found}: <span className="text-[#f0ece4] font-medium">{filtered.length}</span> {t.cars}
             </p>
 
             {/* Grid */}
@@ -130,13 +132,13 @@ export function SaleClient({ cars, brands }: { cars: CarForSale[]; brands: strin
             ) : (
                 <div className="text-center py-20 fade-in">
                     <p className="text-[40px] mb-4">🚗</p>
-                    <p className="text-[18px] font-bold tracking-tight mb-2 text-[#f0ece4]">Ничего не найдено</p>
-                    <p className="text-[14px] text-[#6b6b6b] mb-6">Попробуйте изменить фильтры</p>
+                    <p className="text-[18px] font-bold tracking-tight mb-2 text-[#f0ece4]">{t.emptyTitle}</p>
+                    <p className="text-[14px] text-[#6b6b6b] mb-6">{t.emptySub}</p>
                     <button
                         onClick={resetFilters}
                         className="h-10 px-6 bg-[#c9a96e] text-[#0a0a0a] text-[14px] font-semibold rounded-[10px] hover:bg-[#d4b87a] transition-all duration-300"
                     >
-                        Сбросить фильтры
+                        {t.resetFilters}
                     </button>
                 </div>
             )}
@@ -174,7 +176,7 @@ export function SaleClient({ cars, brands }: { cars: CarForSale[]; brands: strin
                     />
                     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#111111] rounded-t-[20px] px-5 pt-5 pb-8 shadow-lg border-t border-white/[0.06] slide-in-from-bottom">
                         <div className="w-10 h-1 bg-white/[0.10] rounded-full mx-auto mb-6" />
-                        <p className="text-[16px] font-bold tracking-tight mb-4 text-[#f0ece4]">Сортировка</p>
+                        <p className="text-[16px] font-bold tracking-tight mb-4 text-[#f0ece4]">{t.sort}</p>
                         <div className="flex flex-col gap-2">
                             {sortOptions.map(o => (
                                 <button
@@ -207,6 +209,7 @@ interface SaleFilterPanelProps {
 }
 
 function SaleFilterPanel({ filters, setFilters, brands, onApply, onClose, onReset }: SaleFilterPanelProps) {
+    const { sale: t, common } = useDict()
     function set(key: keyof Filters, value: string) {
         setFilters({ ...filters, [key]: value })
     }
@@ -215,7 +218,7 @@ function SaleFilterPanel({ filters, setFilters, brands, onApply, onClose, onRese
         <div className="flex flex-col h-full">
             <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-white/[0.06] flex-shrink-0 relative">
                 <div className="md:hidden w-10 h-1 bg-white/[0.10] rounded-full absolute left-1/2 -translate-x-1/2 top-3" />
-                <p className="text-[17px] font-bold tracking-tight text-[#f0ece4]">Фильтры</p>
+                <p className="text-[17px] font-bold tracking-tight text-[#f0ece4]">{t.filters}</p>
                 <button
                     onClick={onClose}
                     className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/[0.06] text-[#6b6b6b] transition-colors"
@@ -228,55 +231,55 @@ function SaleFilterPanel({ filters, setFilters, brands, onApply, onClose, onRese
 
                 {/* Марка */}
                 <FilterSelect
-                    label="Марка"
+                    label={t.brand}
                     value={filters.brand}
                     onChange={v => set('brand', v)}
                     options={brands.map(b => ({ value: b, label: b }))}
-                    placeholder="Все марки"
+                    placeholder={t.brandAll}
                 />
 
                 {/* КПП */}
                 <FilterSelect
-                    label="Коробка передач"
+                    label={t.transmission}
                     value={filters.transmission}
                     onChange={v => set('transmission', v)}
                     options={[
-                        { value: 'auto', label: 'Автомат' },
-                        { value: 'manual', label: 'Механика' },
+                        { value: 'auto', label: t.auto },
+                        { value: 'manual', label: t.manual },
                     ]}
-                    placeholder="Любая"
+                    placeholder={t.transAny}
                 />
 
                 {/* Топливо */}
                 <FilterSelect
-                    label="Тип топлива"
+                    label={t.fuel}
                     value={filters.fuel_type}
                     onChange={v => set('fuel_type', v)}
                     options={[
-                        { value: 'petrol', label: 'Бензин' },
-                        { value: 'diesel', label: 'Дизель' },
-                        { value: 'electric', label: 'Электро' },
-                        { value: 'hybrid', label: 'Гибрид' },
+                        { value: 'petrol', label: t.petrol },
+                        { value: 'diesel', label: t.diesel },
+                        { value: 'electric', label: t.electric },
+                        { value: 'hybrid', label: t.hybrid },
                     ]}
-                    placeholder="Любой"
+                    placeholder={t.fuelAny}
                 />
 
                 {/* Цена */}
                 <div>
-                    <p className="text-[13px] font-medium text-[#6b6b6b] mb-3">Цена (₸)</p>
+                    <p className="text-[13px] font-medium text-[#6b6b6b] mb-3">{t.priceLabel}</p>
                     <div className="flex gap-3">
                         <input
                             type="number"
                             value={filters.priceMin}
                             onChange={e => set('priceMin', e.target.value)}
-                            placeholder="От"
+                            placeholder={t.priceFrom}
                             className="w-full h-11 px-3.5 bg-[#161616] border border-white/[0.08] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] transition-all"
                         />
                         <input
                             type="number"
                             value={filters.priceMax}
                             onChange={e => set('priceMax', e.target.value)}
-                            placeholder="До"
+                            placeholder={t.priceTo}
                             className="w-full h-11 px-3.5 bg-[#161616] border border-white/[0.08] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] transition-all"
                         />
                     </div>
@@ -284,20 +287,20 @@ function SaleFilterPanel({ filters, setFilters, brands, onApply, onClose, onRese
 
                 {/* Год */}
                 <div>
-                    <p className="text-[13px] font-medium text-[#6b6b6b] mb-3">Год выпуска</p>
+                    <p className="text-[13px] font-medium text-[#6b6b6b] mb-3">{t.yearLabel}</p>
                     <div className="flex gap-3">
                         <input
                             type="number"
                             value={filters.yearMin}
                             onChange={e => set('yearMin', e.target.value)}
-                            placeholder="От"
+                            placeholder={t.priceFrom}
                             className="w-full h-11 px-3.5 bg-[#161616] border border-white/[0.08] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] transition-all"
                         />
                         <input
                             type="number"
                             value={filters.yearMax}
                             onChange={e => set('yearMax', e.target.value)}
-                            placeholder="До"
+                            placeholder={t.priceTo}
                             className="w-full h-11 px-3.5 bg-[#161616] border border-white/[0.08] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] transition-all"
                         />
                     </div>
@@ -305,12 +308,12 @@ function SaleFilterPanel({ filters, setFilters, brands, onApply, onClose, onRese
 
                 {/* Пробег */}
                 <div>
-                    <p className="text-[13px] font-medium text-[#6b6b6b] mb-3">Пробег до (км)</p>
+                    <p className="text-[13px] font-medium text-[#6b6b6b] mb-3">{t.mileageLabel}</p>
                     <input
                         type="number"
                         value={filters.mileageMax}
                         onChange={e => set('mileageMax', e.target.value)}
-                        placeholder="Например 100000"
+                        placeholder={t.mileageExample}
                         className="w-full h-11 px-3.5 bg-[#161616] border border-white/[0.08] rounded-[10px] text-[15px] text-[#f0ece4] placeholder:text-[#3d3d3d] outline-none focus:border-[#c9a96e] focus:ring-3 focus:ring-[#c9a96e]/[0.10] transition-all"
                     />
                 </div>
@@ -322,13 +325,13 @@ function SaleFilterPanel({ filters, setFilters, brands, onApply, onClose, onRese
                     onClick={onReset}
                     className="flex-1 h-11 bg-[#1a1a1a] text-[#f0ece4] font-medium rounded-[10px] border border-white/[0.08] hover:bg-white/[0.04] transition-colors text-[15px]"
                 >
-                    Сбросить
+                    {common.reset}
                 </button>
                 <button
                     onClick={onApply}
                     className="flex-1 h-11 bg-[#c9a96e] text-[#0a0a0a] font-semibold rounded-[10px] hover:bg-[#d4b87a] transition-all duration-300 text-[15px]"
                 >
-                    Применить
+                    {common.apply}
                 </button>
             </div>
         </div>

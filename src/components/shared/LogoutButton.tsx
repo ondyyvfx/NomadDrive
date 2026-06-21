@@ -4,9 +4,11 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { LogOut } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { useDict } from '@/contexts/LanguageContext'
 
 export function LogoutButton() {
     const router = useRouter()
+    const { logout: t } = useDict()
     const [showConfirm, setShowConfirm] = useState(false)
     const [loading, setLoading] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
@@ -39,7 +41,7 @@ export function LogoutButton() {
                     className="inline-flex items-center gap-2 px-4 py-2 text-[15px] text-[#6b6b6b] hover:text-[#ff3b30] hover:bg-[#ff3b30]/[0.06] rounded-[8px] transition-all duration-200"
                 >
                     <LogOut size={16} />
-                    <span className="hidden lg:inline">Выйти</span>
+                    <span className="hidden lg:inline">{t.label}</span>
                 </button>
 
                 {showConfirm && (
@@ -47,10 +49,10 @@ export function LogoutButton() {
 
                         <div className="px-4 pt-4 pb-3">
                             <p className="text-[14px] font-semibold text-[#f0ece4] mb-0.5">
-                                Выйти из аккаунта?
+                                {t.title}
                             </p>
                             <p className="text-[12px] text-[#6b6b6b] leading-relaxed">
-                                Вы будете перенаправлены на главную
+                                {t.sub}
                             </p>
                         </div>
 
@@ -65,13 +67,13 @@ export function LogoutButton() {
                                 {loading && (
                                     <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                 )}
-                                {loading ? 'Выходим...' : 'Да, выйти'}
+                                {loading ? t.going : t.yes}
                             </button>
                             <button
                                 onClick={() => setShowConfirm(false)}
                                 className="w-full h-9 text-[#6b6b6b] text-[13px] font-medium rounded-[8px] hover:bg-white/[0.04] transition-colors"
                             >
-                                Отмена
+                                {t.cancel}
                             </button>
                         </div>
 
@@ -91,10 +93,10 @@ export function LogoutButton() {
                         <div className="w-10 h-1 bg-white/[0.10] rounded-full mx-auto mb-6" />
 
                         <p className="text-[17px] font-bold tracking-tight text-[#f0ece4] mb-1">
-                            Выйти из аккаунта?
+                            {t.title}
                         </p>
                         <p className="text-[14px] text-[#6b6b6b] mb-6">
-                            Вы будете перенаправлены на главную страницу
+                            {t.subLong}
                         </p>
 
                         <div className="flex flex-col gap-3">
@@ -106,13 +108,13 @@ export function LogoutButton() {
                                 {loading && (
                                     <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                 )}
-                                {loading ? 'Выходим...' : 'Да, выйти'}
+                                {loading ? t.going : t.yes}
                             </button>
                             <button
                                 onClick={() => setShowConfirm(false)}
                                 className="w-full h-12 bg-[#1a1a1a] text-[#f0ece4] font-medium rounded-[12px] border border-white/[0.08] hover:bg-white/[0.04] transition-colors text-[16px]"
                             >
-                                Отмена
+                                {t.cancel}
                             </button>
                         </div>
                     </div>

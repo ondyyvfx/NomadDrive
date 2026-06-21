@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { ShoppingCart, Check, Package } from 'lucide-react'
 import { useState } from 'react'
+import { useDict } from '@/contexts/LanguageContext'
 import type { Part } from '@/types'
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function PartCard({ part, onAddToCart, inCart, priority = false }: Props) {
+    const { parts: t, common } = useDict()
     const [added, setAdded] = useState(false)
     const image = part.image_urls?.[0]
 
@@ -49,11 +51,11 @@ export function PartCard({ part, onAddToCart, inCart, priority = false }: Props)
                 <div className="absolute top-3 left-3">
                     {isOutOfStock ? (
                         <span className="px-2.5 py-1 rounded-full text-[12px] font-medium bg-black/70 backdrop-blur-sm text-[#ff3b30]">
-                            Нет в наличии
+                            {t.outOfStock}
                         </span>
                     ) : part.stock <= 5 ? (
                         <span className="px-2.5 py-1 rounded-full text-[12px] font-medium bg-black/70 backdrop-blur-sm text-[#ff9f0a]">
-                            Осталось {part.stock} шт.
+                            {t.leftPrefix} {part.stock} {t.pcs}
                         </span>
                     ) : null}
                 </div>
@@ -87,13 +89,13 @@ export function PartCard({ part, onAddToCart, inCart, priority = false }: Props)
                 {/* OEM */}
                 {part.oem_number && (
                     <p className="text-[11px] font-mono text-[#3d3d3d] mb-3">
-                        OEM: {part.oem_number}
+                        {t.oem}: {part.oem_number}
                     </p>
                 )}
 
                 <div className="mt-auto flex items-center justify-between gap-3 pt-3 border-t border-white/[0.05]">
                     <p className="text-[18px] font-bold tracking-tight text-[#f0ece4]">
-                        {part.price.toLocaleString('ru-RU')} ₸
+                        {part.price.toLocaleString(common.locale)} ₸
                     </p>
 
                     <button
@@ -109,12 +111,12 @@ export function PartCard({ part, onAddToCart, inCart, priority = false }: Props)
                         {inCart || added ? (
                             <>
                                 <Check size={14} />
-                                В корзине
+                                {t.inCart}
                             </>
                         ) : (
                             <>
                                 <ShoppingCart size={14} />
-                                В корзину
+                                {t.addToCart}
                             </>
                         )}
                     </button>
